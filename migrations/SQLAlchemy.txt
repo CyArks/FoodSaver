@@ -1,0 +1,2 @@
+Whenever you make a change to your database models, you can create a new migration by running flask db migrate and then apply it with flask db upgrade.
+The /migrations folder is generally not edited manually. It contains auto-generated code that represents your database schemas and changes. So, the actual code in this directory will depend on your specific models and changes over time.
