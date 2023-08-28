@@ -1,0 +1,4 @@
+layout.html: This is the base template that provides the general structure of your website. It has placeholders for the title and main content, which can be filled in by child templates. It links to your static assets like the CSS file and the JavaScript file.
+index.html: This is a child template extending layout.html. It fills in the main content area of the layout with specific content for the home page.
+
+These templates use the Jinja2 templating engine (as used by Flask). You'll use Flask's render_template() function to render these templates and serve them to the user.
