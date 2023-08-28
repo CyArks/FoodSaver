@@ -6,7 +6,8 @@ from config import DevelopmentConfig, ProductionConfig
 
 def create_app():
     app = Flask(__name__)
-
+    setup_logger(app)
+    
     # Load configurations based on the environment
     if os.environ.get("FLASK_ENV") == "production":
         app.config.from_object(ProductionConfig)
