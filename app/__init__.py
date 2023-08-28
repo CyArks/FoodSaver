@@ -1,6 +1,7 @@
 from flask import Flask, jsonify
 import logging
 from logging.handlers import RotatingFileHandler
+from utils.logger import setup_logger
 import os
 from config import DevelopmentConfig, ProductionConfig
 
