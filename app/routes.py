@@ -79,6 +79,17 @@ def update_offer(offer_id):
     invalidate_offer_cache(offer_id)
     return jsonify({"status": "Offer updated and cache invalidated."})
 
+@app.route('/offer/<int:offer_id>')
+def show_offer(offer_id):
+    offer = get_offer(offer_id)
+    return jsonify(offer)
+
+@app.route('/offer/update/<int:offer_id>', methods=['POST'])
+def update_offer(offer_id):
+    # ... update offer logic ...
+    invalidate_offer_cache(offer_id)
+    return jsonify({"status": "Offer updated and cache invalidated."})
+
 @main.errorhandler(404)
 def handle_404(error):
     logger.warning('404 error occurred')
