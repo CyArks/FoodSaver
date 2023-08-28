@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from utils.cache_manager import get_offer, invalidate_offer_cache
 from .permissions import admin_permission
 from .permissions import require_admin
 from .rate_limiter import limiter
@@ -66,6 +67,17 @@ def admin():
 @limiter.limit("5 per minute")  # Override the default rate limit for this route
 def some_route():
     return 'This is some route.'
+
+@app.route('/offer/<int:offer_id>')
+def show_offer(offer_id):
+    offer = get_offer(offer_id)
+    return jsonify(offer)
+
+@app.route('/offer/update/<int:offer_id>', methods=['POST'])
+def update_offer(offer_id):
+    # ... update offer logic ...
+    invalidate_offer_cache(offer_id)
+    return jsonify({"status": "Offer updated and cache invalidated."})
 
 @main.errorhandler(404)
 def handle_404(error):
