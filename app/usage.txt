@@ -1,0 +1,25 @@
+How to use these tables:
+
+
+Adding items to Fridge:
+new_item = Fridge(item_name='Milk', item_weight=1.5, expiration_date=datetime.utcnow(), owner=current_user)
+db.session.add(new_item)
+db.session.commit()
+
+
+Adding Dietary Preferences:
+new_pref = DietaryPreferences(preference='Vegan', owner=current_user)
+db.session.add(new_pref)
+db.session.commit()
+
+
+Adding a Recipe:
+new_recipe = Recipes(recipe_name='Pancakes', ingredients='Milk, Flour, Eggs')
+db.session.add(new_recipe)
+db.session.commit()
+
+
+Adding a Rating:
+new_rating = Ratings(rating=5, rater=current_user, recipe=target_recipe)
+db.session.add(new_rating)
+db.session.commit()
