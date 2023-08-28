@@ -1,5 +1,7 @@
 from flask import Blueprint, jsonify, request, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from .permissions import admin_permission
+from .permissions import require_admin
 from models import User  # Assuming you have a User model
 import logging
 
@@ -54,6 +56,11 @@ def change_password():
     
     return jsonify({'message': 'Password changed successfully'})
 
+@app.route('/admin')
+@admin_permission.require(http_exception=403)
+def admin():
+    return 'Admin page'
+    
 @main.errorhandler(404)
 def handle_404(error):
     logger.warning('404 error occurred')
