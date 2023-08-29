@@ -212,6 +212,14 @@ def get_grocery_lists():
     lists = GroceryList.query.filter_by(user_id=current_user.id).all()
     return jsonify([list.serialize() for list in lists]), 200
 
+@main.errorhandler(400)
+def handle_400(error):
+    return jsonify({'error': 'Bad Request'}), 400
+
+@main.errorhandler(401)
+def handle_401(error):
+    return jsonify({'error': 'Unauthorized'}), 401
+
 @main.errorhandler(404)
 def handle_404(error):
     logger.warning('404 error occurred')
