@@ -19,6 +19,23 @@ logger = logging.getLogger(__name__)
 def home():
     return jsonify({'message': 'Welcome to the Home Page'})
 
+@app.route('/api/track_waste', methods=['POST'])
+@login_required
+def track_waste():
+    data = request.json
+    waste_action = WasteTracking(
+        food_item_id=data['food_item_id'],
+        action=data['action'],
+        user_id=current_user.id
+    )
+    db.session.add(waste_action)
+    
+    # Update the sustainability score here based on the action
+    # ...
+    
+    db.session.commit()
+    return jsonify({'status': 'Waste tracked', 'new_score': new_score}), 201
+
 @app.route('/api/recipes', methods=['POST'])
 @login_required
 def create_recipe():
