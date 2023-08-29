@@ -109,6 +109,36 @@ def update_offer(offer_id):
     invalidate_offer_cache(offer_id)
     return jsonify({"status": "Offer updated and cache invalidated."})
 
+@app.route('/api/meal_plan', methods=['POST'])
+@login_required
+def create_meal_plan():
+    recipe_ids = request.json['recipe_ids']
+    new_plan = MealPlan(user_id=current_user.id, recipe_ids=recipe_ids)
+    db.session.add(new_plan)
+    db.session.commit()
+    return jsonify({'status': 'Meal plan created'}), 201
+
+@app.route('/api/meal_plan', methods=['GET'])
+@login_required
+def get_meal_plans():
+    plans = MealPlan.query.filter_by(user_id=current_user.id).all()
+    return jsonify([plan.serialize() for plan in plans]), 200
+
+@app.route('/api/grocery_list', methods=['POST'])
+@login_required
+def create_grocery_list():
+    items = request.json['items']
+    new_list = GroceryList(user_id=current_user.id, items=items)
+    db.session.add(new_list)
+    db.session.commit()
+    return jsonify({'status': 'Grocery list created'}), 201
+
+@app.route('/api/grocery_list', methods=['GET'])
+@login_required
+def get_grocery_lists():
+    lists = GroceryList.query.filter_by(user_id=current_user.id).all()
+    return jsonify([list.serialize() for list in lists]), 200
+
 @main.errorhandler(404)
 def handle_404(error):
     logger.warning('404 error occurred')
