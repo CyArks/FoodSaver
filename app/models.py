@@ -16,6 +16,8 @@ class User(db.Model):
     fridge = db.relationship('Fridge', backref='owner', lazy='dynamic')
     dietary_preferences = db.relationship('DietaryPreferences', backref='owner', lazy='dynamic')
     ratings = db.relationship('Ratings', backref='rater', lazy='dynamic')
+    meal_plans = db.relationship("MealPlan", backref="user")
+    grocery_lists = db.relationship("GroceryList", backref="user")
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
