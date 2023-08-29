@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from utils.cache_manager import get_offer, invalidate_offer_cache
 from .permissions import admin_permission
+from flask_login import login_required, current_user
 from .permissions import require_admin
 from .rate_limiter import limiter
 from your_app.models import Recipe, db
@@ -17,6 +18,32 @@ logger = logging.getLogger(__name__)
 @main.route('/')
 def home():
     return jsonify({'message': 'Welcome to the Home Page'})
+
+@app.route('/api/recipes', methods=['POST'])
+@login_required
+def create_recipe():
+    data = request.json
+    new_recipe = Recipe(
+        name=data['name'],
+        ingredients=data['ingredients'],
+        steps=data['steps'],
+        user_id=current_user.id
+    )
+    db.session.add(new_recipe)
+    db.session.commit()
+    return jsonify({'status': 'Recipe created'}), 201
+
+@app.route('/api/recipes', methods=['GET'])
+def get_recipes():
+    recipes = Recipe.query.all()
+    return jsonify([recipe.serialize() for recipe in recipes]), 200
+
+@app.route('/api/recipes/<int:recipe_id>', methods=['GET'])
+def get_single_recipe(recipe_id):
+    recipe = Recipe.query.get(recipe_id)
+    if recipe is None:
+        return jsonify({'error': 'Recipe not found'}), 404
+    return jsonify(recipe.serialize()), 200
 
 @main.route('/secure', methods=['GET'])
 @jwt_required()
