@@ -60,3 +60,24 @@ class Notifications(db.Model):
     sent_at = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
+class Recipe(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64))
+    ingredients = db.Column(db.String(512))  # Comma-separated ingredient IDs
+    prep_time = db.Column(db.Integer)
+    cook_time = db.Column(db.Integer)
+    total_time = db.Column(db.Integer)
+    cuisine_type = db.Column(db.String(64))
+    rating = db.Column(db.Float)  # average user rating
+    
+    # Assuming each recipe can have multiple ratings
+    ratings = db.relationship("RecipeRating", back_populates="recipe")
+
+class RecipeRating(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    rating = db.Column(db.Float)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    recipe_id = db.Column(db.Integer, db.ForeignKey('recipe.id'))
+
+    user = db.relationship("User", back_populates="recipe_ratings")
+    recipe = db.relationship("Recipe", back_populates="ratings")
