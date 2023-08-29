@@ -4,6 +4,7 @@ from utils.cache_manager import get_offer, invalidate_offer_cache
 from .permissions import admin_permission
 from .permissions import require_admin
 from .rate_limiter import limiter
+from your_app.models import Recipe, db
 from models import User  # Assuming you have a User model
 import logging
 
@@ -73,11 +74,29 @@ def show_offer(offer_id):
     offer = get_offer(offer_id)
     return jsonify(offer)
 
-@app.route('/offer/update/<int:offer_id>', methods=['POST'])
-def update_offer(offer_id):
-    # ... update offer logic ...
-    invalidate_offer_cache(offer_id)
-    return jsonify({"status": "Offer updated and cache invalidated."})
+@app.route('/api/search_recipes', methods=['GET'])
+def search_recipes():
+    query = db.session.query(Recipe)
+
+    # Filtering by ingredients
+    ingredients = request.args.get('ingredients')
+    if ingredients:
+        query = query.filter(Recipe.ingredients.ilike(f"%{ingredients}%"))
+
+    # Filtering by time
+    max_time = request.args.get('max_time')
+    if max_time:
+        query = query.filter(Recipe.total_time <= max_time)
+
+    # Sorting by rating
+    sort_by_rating = request.args.get('sort_by_rating')
+    if sort_by_rating:
+        query = query.order_by(Recipe.rating.desc())
+        
+    # Add more filters as needed
+    
+    recipes = query.all()
+    return jsonify([recipe.serialize() for recipe in recipes])  # Assuming you have a serialize method in your Recipe model
 
 @app.route('/offer/<int:offer_id>')
 def show_offer(offer_id):
