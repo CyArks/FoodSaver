@@ -19,6 +19,7 @@ class User(db.Model):
     meal_plans = db.relationship("MealPlan", backref="user")
     grocery_lists = db.relationship("GroceryList", backref="user")
     recipes = db.relationship("Recipe", back_populates="user")
+    waste_actions = db.relationship("WasteTracking", back_populates="user")
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
