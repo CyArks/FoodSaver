@@ -63,6 +63,18 @@ class Notifications(db.Model):
     sent_at = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
+class WasteTracking(db.Model):
+    __tablename__ = 'waste_tracking'
+    
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    food_item_id = db.Column(db.Integer, db.ForeignKey('fridge.id'), nullable=False)
+    action = db.Column(db.String(50), nullable=False)  # Used, Expired, or Thrown
+    date = db.Column(db.DateTime, default=datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+
+    user = db.relationship("User", back_populates="waste_actions")
+
+
 class Recipe(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
