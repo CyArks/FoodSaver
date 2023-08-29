@@ -1,5 +1,6 @@
 import unittest
 from your_app_name.permissions import has_permission
+from unittest.mock import patch  # Added for mocking
 
 class TestPermissions(unittest.TestCase):
     
@@ -18,7 +19,10 @@ class TestPermissions(unittest.TestCase):
         self.assertFalse(has_permission("guest", "write"))
         self.assertFalse(has_permission("guest", "delete"))
 
-# Additional tests can be added here
+    @patch('your_app_name.permissions.database')  # Mocking database
+    def test_mocked_database(self, mock_db):
+        mock_db.get_permission.return_value = True
+        self.assertTrue(has_permission("user", "read"))
 
 if __name__ == "__main__":
     unittest.main()
