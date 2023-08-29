@@ -81,3 +81,19 @@ class RecipeRating(db.Model):
 
     user = db.relationship("User", back_populates="recipe_ratings")
     recipe = db.relationship("Recipe", back_populates="ratings")
+    
+class MealPlan(db.Model):
+    __tablename__ = 'meal_plans'
+    
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    recipe_ids = db.Column(db.String(500), nullable=True)  # Comma-separated list of recipe IDs
+    date = db.Column(db.DateTime, default=datetime.utcnow)
+
+class GroceryList(db.Model):
+    __tablename__ = 'grocery_lists'
+    
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    items = db.Column(db.String(500), nullable=True)  # Comma-separated list of items
+
