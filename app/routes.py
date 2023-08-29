@@ -30,8 +30,19 @@ def track_waste():
     )
     db.session.add(waste_action)
     
-    # Update the sustainability score here based on the action
-    # ...
+    def calculate_sustainability_score(user_id):
+    waste_actions = WasteTracking.query.filter_by(user_id=user_id).all()
+    score = 0
+    for action in waste_actions:
+        if action.action == "Used":
+            score += 10
+        elif action.action == "Thrown":
+            score -= 5
+    return score
+
+# Update the sustainability score here based on the action
+new_score = calculate_sustainability_score(current_user.id)
+current_user.sustainability_score = new_score
     
     db.session.commit()
     return jsonify({'status': 'Waste tracked', 'new_score': new_score}), 201
