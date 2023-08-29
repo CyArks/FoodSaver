@@ -18,6 +18,7 @@ class User(db.Model):
     ratings = db.relationship('Ratings', backref='rater', lazy='dynamic')
     meal_plans = db.relationship("MealPlan", backref="user")
     grocery_lists = db.relationship("GroceryList", backref="user")
+    recipes = db.relationship("Recipe", back_populates="user")
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -64,6 +65,8 @@ class Notifications(db.Model):
 
 class Recipe(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    user = db.relationship("User", back_populates="recipes")
     name = db.Column(db.String(64))
     ingredients = db.Column(db.String(512))  # Comma-separated ingredient IDs
     prep_time = db.Column(db.Integer)
