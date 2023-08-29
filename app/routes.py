@@ -19,6 +19,24 @@ logger = logging.getLogger(__name__)
 def home():
     return jsonify({'message': 'Welcome to the Home Page'})
 
+
+@app.route('/api/fetch_deals', methods=['GET'])
+def fetch_deals():
+    # For demonstration purposes, we'll assume "Too Good To Go" has an endpoint like this:
+    too_good_to_go_data = requests.get("https://api.toogoodtogo.com/deals").json()
+
+    # Similarly, for local stores, you could add more API calls
+    # local_store_data = requests.get("https://api.localstore.com/deals").json()
+
+    # You might want to process the data before sending it to the frontend
+    processed_data = {
+        "too_good_to_go": too_good_to_go_data,
+        # "local_store": local_store_data
+    }
+
+    return jsonify(processed_data), 200
+    
+
 @app.route('/api/track_waste', methods=['POST'])
 @login_required
 def track_waste():
