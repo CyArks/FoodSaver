@@ -53,3 +53,10 @@ class Ratings(db.Model):
     rating = db.Column(db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     recipe_id = db.Column(db.Integer, db.ForeignKey('recipes.id'))
+
+class Notifications(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    message = db.Column(db.String(256))
+    sent_at = db.Column(db.DateTime, default=datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
