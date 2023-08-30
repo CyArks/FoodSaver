@@ -3,6 +3,7 @@ from your_app.models import db, Fridge, User, Notifications
 from datetime import datetime, timedelta
 from your_app import your_mail_function  # assume you have a function to send email
 
+
 def check_expirations():
     # Logic to find expired items
     now = datetime.utcnow()
@@ -21,6 +22,7 @@ def check_expirations():
             your_mail_function(owner.email, "Expiration Warning", message)
 
     db.session.commit()
+
 
 # Initialize the scheduler
 scheduler = BackgroundScheduler()

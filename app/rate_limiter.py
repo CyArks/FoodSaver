@@ -7,6 +7,7 @@ limiter = Limiter(
     default_limits=["200 per day", "50 per hour"]  # Global rate limit
 )
 
+
 def configure_rate_limits(app):
     """Initialize rate limiting on the given Flask app."""
     limiter.init_app(app)

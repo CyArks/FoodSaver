@@ -3,16 +3,28 @@ import axios from 'axios';
 
 const ListRecipes = () => {
     const [recipes, setRecipes] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         axios.get('/api/recipes')
             .then(response => {
                 setRecipes(response.data);
+                setLoading(false);
             })
             .catch(error => {
-                console.log('Error fetching recipes:', error);
+                alert('Error fetching recipes. Please try again.');
+                console.error('Error fetching recipes:', error);
+                setLoading(false);
             });
     }, []);
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
+    if (recipes.length === 0) {
+        return <div>No recipes available.</div>;
+    }
 
     return (
         <div>

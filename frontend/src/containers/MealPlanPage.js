@@ -4,17 +4,24 @@ import MealPlanComponent from './MealPlanComponent';
 
 const MealPlanPage = () => {
   const [mealPlans, setMealPlans] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch meal plans for the current user
     axios.get('/api/meal_plan')
       .then(response => {
         setMealPlans(response.data);
+        setLoading(false);
       })
       .catch(error => {
-        console.log('Error fetching meal plans:', error);
+        alert('Error fetching meal plans. Please try again.');
+        console.error('Error fetching meal plans:', error);
+        setLoading(false);
       });
-  }, []);  // Empty dependency array means this useEffect runs once when the component mounts
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <MealPlanComponent recipes={mealPlans} />

@@ -1,14 +1,25 @@
 import React from 'react';
 
-const RecipeComponent = ({ recipes }) => (
-    <div className="recipe-list">
-        {recipes.map((recipe, index) => (
-            <div key={index} className="recipe-item">
-                <span>{recipe.name}</span>
-                <span>Rating: {recipe.rating}</span>
-            </div>
-        ))}
-    </div>
-);
+const MealPlanComponent = ({ recipes }) => {
+    if (!recipes) {
+        return <div>Loading...</div>;
+    }
 
-export default RecipeComponent;
+    if (recipes.length === 0) {
+        return <div>No meal plans available.</div>;
+    }
+
+    return (
+        <div className="meal-plan">
+            {recipes.map((recipe) => (
+                <div key={recipe.id} className="meal-plan-item">
+                    <span>{recipe.name}</span>
+                    <span>Ingredients: {recipe.ingredients}</span>
+                    <span>Steps: {recipe.steps}</span>
+                </div>
+            ))}
+        </div>
+    );
+};
+
+export default MealPlanComponent;

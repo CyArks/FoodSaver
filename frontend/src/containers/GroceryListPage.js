@@ -4,17 +4,24 @@ import GroceryListComponent from './GroceryListComponent';
 
 const GroceryListPage = () => {
   const [groceryLists, setGroceryLists] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch grocery lists for the current user
     axios.get('/api/grocery_list')
       .then(response => {
         setGroceryLists(response.data);
+        setLoading(false);
       })
       .catch(error => {
-        console.log('Error fetching grocery lists:', error);
+        alert('Error fetching grocery lists. Please try again.');
+        console.error('Error fetching grocery lists:', error);
+        setLoading(false);
       });
   }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <GroceryListComponent items={groceryLists} />

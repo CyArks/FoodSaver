@@ -13,13 +13,20 @@ const CreateRecipe = () => {
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (!formData.name || !formData.ingredients || !formData.steps) {
+            alert('All fields are required.');
+            return;
+        }
+
         axios.post('/api/recipes', formData)
             .then(response => {
                 alert('Recipe created successfully!');
             })
             .catch(error => {
-                console.log('Error creating recipe:', error);
+                alert('Error creating recipe. Please try again.');
+                console.error('Error creating recipe:', error);
             });
     };
 
@@ -27,9 +34,9 @@ const CreateRecipe = () => {
         <div>
             <h1>Create a New Recipe</h1>
             <form onSubmit={handleSubmit}>
-                <input type="text" name="name" placeholder="Recipe name" onChange={handleChange} />
-                <textarea name="ingredients" placeholder="Ingredients" onChange={handleChange}></textarea>
-                <textarea name="steps" placeholder="Steps" onChange={handleChange}></textarea>
+                <input type="text" name="name" placeholder="Recipe name" onChange={handleChange} required />
+                <textarea name="ingredients" placeholder="Ingredients" onChange={handleChange} required></textarea>
+                <textarea name="steps" placeholder="Steps" onChange={handleChange} required></textarea>
                 <button type="submit">Submit</button>
             </form>
         </div>

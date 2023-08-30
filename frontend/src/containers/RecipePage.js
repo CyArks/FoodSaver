@@ -10,7 +10,7 @@ const RecipePage = () => {
     const [searchTerm, setSearchTerm] = useState('');
 
     const handleSearch = () => {
-        // Simulating a search query, replace this with an actual API call
+        // TODO: Replace this with an actual API call
         const newRecipes = [
             { name: 'Spaghetti', rating: 4.2 },
             { name: 'Salad', rating: 3.8 },
@@ -28,7 +28,11 @@ const RecipePage = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
             />
             <button onClick={handleSearch}>Search</button>
-            <RecipeComponent recipes={recipes} />
+            {recipes.length > 0 ? (
+                <RecipeComponent recipes={recipes} />
+            ) : (
+                <p>No recipes found for "{searchTerm}"</p>
+            )}
         </div>
     );
 };
