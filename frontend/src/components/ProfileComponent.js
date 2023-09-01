@@ -8,7 +8,7 @@ const MealPlanComponent = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Replace with your API endpoint
+
         const response = await axios.get('/api/meal_plan');
         if (response.status === 200) {
           setMealPlans(response.data);

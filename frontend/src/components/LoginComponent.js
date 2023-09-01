@@ -15,7 +15,7 @@ const ListRecipes = () => {
       };
 
       try {
-        const response = await axios.get('/api/recipes', config);
+        const response = await axios.get('/api/login', config);
         setRecipes(response.data);
         setLoading(false);
       } catch (error) {

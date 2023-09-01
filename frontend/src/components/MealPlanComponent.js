@@ -8,7 +8,7 @@ const MealPlanComponent = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Replace with your API endpoint
+
         const response = await axios.get('/api/meal_plan');
         if (response.status === 200) {
           setMealPlans(response.data);
@@ -28,15 +28,13 @@ const MealPlanComponent = () => {
       {isLoading ? (
         <p>Loading...</p>
       ) : (
-        <div>
+        <ul>
           {mealPlans.map((plan, index) => (
-            <div key={index}>
-              <h2>{plan.name}</h2>
-              <p>Recipes: {plan.recipes.join(', ')}</p>
-              {/* Add more meal plan details here */}
-            </div>
+            <li key={index}>
+              Plan {index + 1}: {plan.recipe_ids.join(', ')}
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </div>
   );
