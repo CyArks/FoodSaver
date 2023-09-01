@@ -213,12 +213,6 @@ def search_recipes():
     return jsonify([recipe.serialize() for recipe in recipes])
 
 
-@main.route('/offer/<int:offer_id>')
-def show_offer(offer_id):
-    offer = get_offer(offer_id)
-    return jsonify(offer)
-
-
 @main.route('/offer/update/<int:offer_id>', methods=['POST'])
 def update_offer(offer_id):
     # ... update offer logic ...

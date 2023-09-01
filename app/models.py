@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 

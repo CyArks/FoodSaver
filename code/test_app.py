@@ -1,5 +1,5 @@
 import unittest
-from your_app_name import create_app, db
+from app import create_app, db
 
 class TestApp(unittest.TestCase):
     
@@ -21,6 +21,7 @@ class TestApp(unittest.TestCase):
         self.assertIn(b'Welcome to Your App!', response.data)
 
 # Additional tests can be added here
+
 
 if __name__ == "__main__":
     unittest.main()
