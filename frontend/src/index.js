@@ -1,7 +1,9 @@
+// frontend/src/index.js
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
-import './index.css';
+import './global.css';  // Import global styles
 
 ReactDOM.render(
   <React.StrictMode>
