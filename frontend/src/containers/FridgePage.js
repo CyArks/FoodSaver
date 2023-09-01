@@ -1,31 +1,38 @@
 import React, { useState } from 'react';
 import FridgeComponent from '../components/FridgeComponent';
 
+// FridgePage is responsible for managing the fridge items
 const FridgePage = () => {
-    const [fridgeItems, setFridgeItems] = useState([
-        { name: 'Milk', expirationDate: '2023-08-30' },
-        { name: 'Cheese', expirationDate: '2023-09-15' },
-    ]);
-    const [newItem, setNewItem] = useState({ name: '', expirationDate: '' });
+  // State to hold the fridge items
+  const [fridgeItems, setFridgeItems] = useState([]);
+  // State to hold the new item to be added
+  const [newItem, setNewItem] = useState('');
 
-    const addItem = () => {
-        if (!newItem.name || !newItem.expirationDate) {
-            alert('Both name and expiration date are required.');
-            return;
-        }
-        setFridgeItems([...fridgeItems, newItem]);
-        setNewItem({ name: '', expirationDate: '' });
-    };
+  // Function to add a new item to the fridge
+  const addItem = () => {
+    if (newItem === '') {
+      alert('Item cannot be empty');
+      return;
+    }
 
-    return (
-        <div className="fridge-page">
-            <h1>Your Fridge</h1>
-            <FridgeComponent items={fridgeItems} />
-            <input type="text" placeholder="Item Name" value={newItem.name} onChange={(e) => setNewItem({ ...newItem, name: e.target.value })} />
-            <input type="date" placeholder="Expiration Date" value={newItem.expirationDate} onChange={(e) => setNewItem({ ...newItem, expirationDate: e.target.value })} />
-            <button onClick={addItem}>Add New Item</button>
-        </div>
-    );
+    // TODO: Make an API call to add the item to the fridge in the backend
+    // For now, we'll just add it to the local state
+    setFridgeItems([...fridgeItems, newItem]);
+    setNewItem('');
+  };
+
+  return (
+    <div>
+      <FridgeComponent fridgeItems={fridgeItems} />
+      <input
+        type="text"
+        value={newItem}
+        onChange={(e) => setNewItem(e.target.value)}
+        placeholder="Add a new item"
+      />
+      <button onClick={addItem}>Add Item</button>
+    </div>
+  );
 };
 
 export default FridgePage;

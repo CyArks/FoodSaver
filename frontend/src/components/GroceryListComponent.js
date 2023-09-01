@@ -1,24 +1,51 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import GroceryListComponent from '../components/GroceryListComponent';
 
-const GroceryListComponent = ({ items }) => {
-    if (!items) {
-        return <div>Loading...</div>;
+// GroceryListPage is responsible for managing the grocery lists
+const GroceryListPage = () => {
+  // State to hold the grocery lists
+  const [groceryLists, setGroceryLists] = useState([]);
+  // State to hold the new grocery list to be added
+  const [newGroceryList, setNewGroceryList] = useState('');
+
+  // Function to fetch grocery lists from the backend
+  const fetchGroceryLists = async () => {
+    // TODO: Make an API call to fetch grocery lists from the backend
+    // For now, we'll use some dummy data
+    const dummyGroceryLists = ['Grocery List 1', 'Grocery List 2'];
+    setGroceryLists(dummyGroceryLists);
+  };
+
+  // Fetch grocery lists when the component mounts
+  useEffect(() => {
+    fetchGroceryLists();
+  }, []);
+
+  // Function to add a new grocery list
+  const addGroceryList = () => {
+    if (newGroceryList === '') {
+      alert('Grocery List cannot be empty');
+      return;
     }
 
-    if (items.length === 0) {
-        return <div>Your grocery list is empty.</div>;
-    }
+    // TODO: Make an API call to add the grocery list in the backend
+    // For now, we'll just add it to the local state
+    setGroceryLists([...groceryLists, newGroceryList]);
+    setNewGroceryList('');
+  };
 
-    return (
-        <div className="grocery-list">
-            {items.map((item) => (
-                <div key={item.id} className="grocery-item">
-                    <span>{item.name}</span>
-                    <span>Quantity: {item.quantity}</span>
-                </div>
-            ))}
-        </div>
-    );
+  return (
+    <div>
+      <GroceryListComponent groceryLists={groceryLists} />
+      <input
+        type="text"
+        value={newGroceryList}
+        onChange={(e) => setNewGroceryList(e.target.value)}
+        placeholder="Add a new grocery list"
+      />
+      <button onClick={addGroceryList}>Add Grocery List</button>
+    </div>
+  );
 };
 
-export default GroceryListComponent;
+export default GroceryListPage;

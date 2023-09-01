@@ -1,30 +1,50 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import GroceryListComponent from './GroceryListComponent';
+import GroceryListComponent from '../components/GroceryListComponent';
 
+// GroceryListPage is responsible for managing the grocery lists
 const GroceryListPage = () => {
+  // State to hold the grocery lists
   const [groceryLists, setGroceryLists] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // State to hold the new grocery list to be added
+  const [newGroceryList, setNewGroceryList] = useState('');
 
+  // Function to fetch grocery lists from the backend
+  const fetchGroceryLists = async () => {
+    // TODO: Make an API call to fetch grocery lists from the backend
+    // For now, we'll use some dummy data
+    const dummyGroceryLists = ['Grocery List 1', 'Grocery List 2'];
+    setGroceryLists(dummyGroceryLists);
+  };
+
+  // Fetch grocery lists when the component mounts
   useEffect(() => {
-    axios.get('/api/grocery_list')
-      .then(response => {
-        setGroceryLists(response.data);
-        setLoading(false);
-      })
-      .catch(error => {
-        alert('Error fetching grocery lists. Please try again.');
-        console.error('Error fetching grocery lists:', error);
-        setLoading(false);
-      });
+    fetchGroceryLists();
   }, []);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  // Function to add a new grocery list
+  const addGroceryList = () => {
+    if (newGroceryList === '') {
+      alert('Grocery List cannot be empty');
+      return;
+    }
+
+    // TODO: Make an API call to add the grocery list in the backend
+    // For now, we'll just add it to the local state
+    setGroceryLists([...groceryLists, newGroceryList]);
+    setNewGroceryList('');
+  };
 
   return (
-    <GroceryListComponent items={groceryLists} />
+    <div>
+      <GroceryListComponent groceryLists={groceryLists} />
+      <input
+        type="text"
+        value={newGroceryList}
+        onChange={(e) => setNewGroceryList(e.target.value)}
+        placeholder="Add a new grocery list"
+      />
+      <button onClick={addGroceryList}>Add Grocery List</button>
+    </div>
   );
 };
 
