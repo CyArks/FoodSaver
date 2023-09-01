@@ -15,7 +15,7 @@ class User(db.Model):
     password_hash = db.Column(db.String(128), nullable=False)
     role = db.Column(db.String(50), nullable=False, default='user')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    fridge = db.relationship('FridgeItem', backref='owner', lazy='dynamic')
+    fridge_item = db.relationship('FridgeItem', backref='owner', lazy='dynamic')
     dietary_preferences = db.relationship('DietaryPreferences', backref='owner', lazy='dynamic')
     ratings = db.relationship('Ratings', backref='rater', lazy='dynamic')
     meal_plans = db.relationship("MealPlan", backref="user")
@@ -80,7 +80,7 @@ class WasteTracking(db.Model):
     __tablename__ = 'waste_tracking'
     
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    food_item_id = db.Column(db.Integer, db.ForeignKey('fridge.id'), nullable=False)
+    food_item_id = db.Column(db.Integer, db.ForeignKey('FridgeItem.id'), nullable=False)
     action = db.Column(db.String(50), nullable=False)  # Used, Expired, or Thrown
     date = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)

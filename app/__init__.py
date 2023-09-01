@@ -24,6 +24,8 @@ def create_app():
 
     # Initialize other extensions'
     db.init_app(app)
+    with app.app_context():
+        db.create_all()
 
     # Configure logging
     handler = RotatingFileHandler("app.log", maxBytes=10000, backupCount=3)
