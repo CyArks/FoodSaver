@@ -36,13 +36,13 @@ def configure_permissions(app):
 logging.basicConfig(level=logging.INFO)
 
 
-def require_admin():
+def require_admin(current_user):
     if not admin_permission.can():
-        logging.warning('Unauthorized admin access attempt.')
+        logging.warning(f"Unauthorized admin access attempt by: {current_user.id}")
         return jsonify({'error': 'You do not have admin permissions'}), 403
 
 
-def require_user():
+def require_user(current_user):
     if not user_permission.can():
-        logging.warning('Unauthorized user access attempt.')
+        logging.warning(f"Unauthorized user access attempt by: {current_user.id}")
         return jsonify({'error': 'You do not have user permissions'}), 403

@@ -1,3 +1,4 @@
+import logging
 import re
 import smtplib
 from email.mime.text import MIMEText
@@ -27,9 +28,10 @@ def send_mail(to_email, subject, message):
         server.sendmail(from_email, to_email, msg.as_string())
         server.quit()
 
-        print(f"Email sent to {to_email}")
+        logging.info(f"Sent email to {to_email} with subject {subject}.")
+
     except Exception as e:
-        print(f"An error occurred while sending email: {e}")
+        logging.critical(f"Sending email to {to_email} with subject {subject} failed.")
 
 
 def validate_email(email):

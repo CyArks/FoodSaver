@@ -7,6 +7,7 @@ from flask_login import login_required, current_user
 from .rate_limiter import limiter
 from .models import Recipe, db
 from models import User, FridgeItem, GroceryList, MealPlan, WasteTracking
+from jsonschema import validate, ValidationError
 import logging
 
 # Create Blueprint
@@ -38,12 +39,26 @@ def fetch_deals():
     return jsonify(processed_data), 200
     
 
+waste_schema = {
+    "type": "object",
+    "properties": {
+        "food_item_id": {"type": "string"},
+        "action": {"type": "string", "enum": ["Used", "Thrown"]},
+    },
+    "required": ["food_item_id", "action"]
+}
+
+
 @main.route('/api/track_waste', methods=['POST'])
 @login_required
 def track_waste():
     data = request.json
-    if not data.get('food_item_id') or not data.get('action'):
-        return jsonify({'error': 'Missing required fields'}), 400
+    logging.info(f"Received waste tracking data: {data}")
+
+    try:
+        validate(instance=data, schema=waste_schema)
+    except ValidationError as e:
+        return jsonify({"error": str(e)}), 400
 
     waste_action = WasteTracking(
         food_item_id=data['food_item_id'],
@@ -51,7 +66,8 @@ def track_waste():
         user_id=current_user.id
     )
     db.session.add(waste_action)
-    
+    logging.info(f"Waste tracking for user {current_user.id} successful.")
+
     def calculate_sustainability_score(user_id):
         waste_actions = WasteTracking.query.filter_by(user_id=user_id).all()
         score = 0
@@ -166,6 +182,16 @@ def show_offer(offer_id):
 def search_recipes():
     query = db.session.query(Recipe)
 
+    # Filtering by dietary restrictions
+    dietary_restrictions = request.args.get('dietary_restrictions')
+    if dietary_restrictions:
+        query = query.filter(Recipe.dietary_restrictions.ilike(f"%{dietary_restrictions}%"))
+
+    # Filtering by cuisine type
+    cuisine_type = request.args.get('cuisine_type')
+    if cuisine_type:
+        query = query.filter(Recipe.cuisine_type == cuisine_type)
+
     # Filtering by ingredients
     ingredients = request.args.get('ingredients')
     if ingredients:
@@ -240,6 +266,8 @@ def update_profile():
     data = request.json
     current_user.username = data.get('username', current_user.username)
     current_user.email = data.get('email', current_user.email)
+    current_user.dietary_preferences = data.get('dietary_preferences', current_user.dietary_preferences)
+    current_user.notification_preferences = data.get('notification_preferences', current_user.notification_preferences)
     db.session.commit()
     return jsonify({'status': 'Profile updated'}), 200
 
