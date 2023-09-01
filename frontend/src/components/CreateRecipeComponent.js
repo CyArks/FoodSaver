@@ -2,45 +2,68 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 const CreateRecipe = () => {
-    const [formData, setFormData] = useState({
-        name: '',
-        ingredients: '',
-        steps: ''
+  const [formData, setFormData] = useState({
+    name: '',
+    ingredients: '',
+    steps: ''
+  });
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
     });
+  };
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const token = localStorage.getItem('jwtToken');
+    const config = {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (!formData.name || !formData.ingredients || !formData.steps) {
-            alert('All fields are required.');
-            return;
-        }
+    try {
+      const response = await axios.post('/api/recipes', formData, config);
+      alert('Recipe created successfully');
+    } catch (error) {
+      if (error.response.status === 401) {
+        localStorage.removeItem('jwtToken');
+        alert('Unauthorized. Please login again.');
+      } else {
+        alert('An error occurred');
+      }
+    }
+  };
 
-        axios.post('/api/recipes', formData)
-            .then(response => {
-                alert('Recipe created successfully!');
-            })
-            .catch(error => {
-                alert('Error creating recipe. Please try again.');
-                console.error('Error creating recipe:', error);
-            });
-    };
-
-    return (
-        <div>
-            <h1>Create a New Recipe</h1>
-            <form onSubmit={handleSubmit}>
-                <input type="text" name="name" placeholder="Recipe name" onChange={handleChange} required />
-                <textarea name="ingredients" placeholder="Ingredients" onChange={handleChange} required></textarea>
-                <textarea name="steps" placeholder="Steps" onChange={handleChange} required></textarea>
-                <button type="submit">Submit</button>
-            </form>
-        </div>
-    );
+  return (
+    <div>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          placeholder="Recipe Name"
+        />
+        <textarea
+          name="ingredients"
+          value={formData.ingredients}
+          onChange={handleChange}
+          placeholder="Ingredients"
+        ></textarea>
+        <textarea
+          name="steps"
+          value={formData.steps}
+          onChange={handleChange}
+          placeholder="Steps"
+        ></textarea>
+        <button type="submit">Create Recipe</button>
+      </form>
+    </div>
+  );
 };
 
 export default CreateRecipe;

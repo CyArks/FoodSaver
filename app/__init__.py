@@ -10,8 +10,8 @@ import os
 
 def create_app():
     app = Flask(__name__)
-    app.config['JWT_SECRET_KEY'] = 'your-secret-key'  # Change this!
-    app.config['JWT_TOKEN_LOCATION'] = ['headers']  # This is the missing configuration
+    app.config['JWT_SECRET_KEY'] = 'your-secret-key'
+    app.config['JWT_TOKEN_LOCATION'] = ['headers']
 
     jwt = JWTManager(app)
 
@@ -19,7 +19,6 @@ def create_app():
         app.config.from_object(ProductionConfig)
     else:
         app.config.from_object(DevelopmentConfig)
-    # ... rest of your create_app function ...
 
     app.register_blueprint(main)
     # Initialize other extensions'
