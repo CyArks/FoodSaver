@@ -1,13 +1,12 @@
 import requests
-from flask import Blueprint, jsonify, request, current_app, app
+from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from utils.cache_manager import get_offer, invalidate_offer_cache
+from app.cache_manager import get_offer, invalidate_offer_cache
 from .permissions import admin_permission
 from flask_login import login_required, current_user
-from .permissions import require_admin
 from .rate_limiter import limiter
 from .models import Recipe, db
-from models import User, FridgeItem, GroceryList, MealPlan, WasteTracking  # Assuming you have a User model
+from models import User, FridgeItem, GroceryList, MealPlan, WasteTracking
 import logging
 
 # Create Blueprint
@@ -22,7 +21,7 @@ def home():
     return jsonify({'message': 'Welcome to the Home Page'})
 
 
-@app.route('/api/fetch_deals', methods=['GET'])
+@main.route('/api/fetch_deals', methods=['GET'])
 def fetch_deals():
     # For demonstration purposes, we'll assume "Too Good To Go" has an endpoint like this:
     too_good_to_go_data = requests.get("https://api.toogoodtogo.com/deals").json()
@@ -39,10 +38,13 @@ def fetch_deals():
     return jsonify(processed_data), 200
     
 
-@app.route('/api/track_waste', methods=['POST'])
+@main.route('/api/track_waste', methods=['POST'])
 @login_required
 def track_waste():
     data = request.json
+    if not data.get('food_item_id') or not data.get('action'):
+        return jsonify({'error': 'Missing required fields'}), 400
+
     waste_action = WasteTracking(
         food_item_id=data['food_item_id'],
         action=data['action'],
@@ -69,7 +71,7 @@ def track_waste():
     return jsonify({'status': 'Waste tracked', 'new_score': new_score}), 201
 
 
-@app.route('/api/recipes', methods=['POST'])
+@main.route('/api/recipes', methods=['POST'])
 @login_required
 def create_recipe():
     data = request.json
@@ -84,13 +86,13 @@ def create_recipe():
     return jsonify({'status': 'Recipe created'}), 201
 
 
-@app.route('/api/recipes', methods=['GET'])
+@main.route('/api/recipes', methods=['GET'])
 def get_recipes():
     recipes = Recipe.query.all()
     return jsonify([recipe.serialize() for recipe in recipes]), 200
 
 
-@app.route('/api/recipes/<int:recipe_id>', methods=['GET'])
+@main.route('/api/recipes/<int:recipe_id>', methods=['GET'])
 def get_single_recipe(recipe_id):
     recipe = Recipe.query.get(recipe_id)
     if recipe is None:
@@ -142,25 +144,25 @@ def change_password():
     return jsonify({'message': 'Password changed successfully'})
 
 
-@app.route('/admin')
+@main.route('/admin')
 @admin_permission.require(http_exception=403)
 def admin():
     return 'Admin page'
 
 
-@app.route('/some_path')
+@main.route('/some_path')
 @limiter.limit("5 per minute")  # Override the default rate limit for this route
 def some_route():
     return 'This is some route.'
 
 
-@app.route('/offer/<int:offer_id>')
+@main.route('/offer/<int:offer_id>')
 def show_offer(offer_id):
     offer = get_offer(offer_id)
     return jsonify(offer)
 
 
-@app.route('/api/search_recipes', methods=['GET'])
+@main.route('/api/search_recipes', methods=['GET'])
 def search_recipes():
     query = db.session.query(Recipe)
 
@@ -179,26 +181,26 @@ def search_recipes():
     if sort_by_rating:
         query = query.order_by(Recipe.rating.desc())
         
-    # Add more filters as needed
+    # Add more filters as neded
     
     recipes = query.all()
-    return jsonify([recipe.serialize() for recipe in recipes])  # Assuming you have a serialize method in your Recipe model
+    return jsonify([recipe.serialize() for recipe in recipes])
 
 
-@app.route('/offer/<int:offer_id>')
+@main.route('/offer/<int:offer_id>')
 def show_offer(offer_id):
     offer = get_offer(offer_id)
     return jsonify(offer)
 
 
-@app.route('/offer/update/<int:offer_id>', methods=['POST'])
+@main.route('/offer/update/<int:offer_id>', methods=['POST'])
 def update_offer(offer_id):
     # ... update offer logic ...
     invalidate_offer_cache(offer_id)
     return jsonify({"status": "Offer updated and cache invalidated."})
 
 
-@app.route('/api/meal_plan', methods=['POST'])
+@main.route('/api/meal_plan', methods=['POST'])
 @login_required
 def create_meal_plan():
     recipe_ids = request.json['recipe_ids']
@@ -208,14 +210,14 @@ def create_meal_plan():
     return jsonify({'status': 'Meal plan created'}), 201
 
 
-@app.route('/api/meal_plan', methods=['GET'])
+@main.route('/api/meal_plan', methods=['GET'])
 @login_required
 def get_meal_plans():
     plans = MealPlan.query.filter_by(user_id=current_user.id).all()
     return jsonify([plan.serialize() for plan in plans]), 200
 
 
-@app.route('/api/grocery_list', methods=['POST'])
+@main.route('/api/grocery_list', methods=['POST'])
 @login_required
 def create_grocery_list():
     items = request.json['items']
@@ -225,14 +227,14 @@ def create_grocery_list():
     return jsonify({'status': 'Grocery list created'}), 201
 
 
-@app.route('/api/grocery_list', methods=['GET'])
+@main.route('/api/grocery_list', methods=['GET'])
 @login_required
 def get_grocery_lists():
     lists = GroceryList.query.filter_by(user_id=current_user.id).all()
-    return jsonify([list.serialize() for list in lists]), 200
+    return jsonify([item.serialize() for item in lists]), 200
 
 
-@app.route('/api/update_profile', methods=['POST'])
+@main.route('/api/update_profile', methods=['POST'])
 @login_required
 def update_profile():
     data = request.json
@@ -242,11 +244,15 @@ def update_profile():
     return jsonify({'status': 'Profile updated'}), 200
 
 
-@app.route('/api/fridge/bulk_add', methods=['POST'])
+@main.route('/api/fridge/bulk_add', methods=['POST'])
 @login_required
 def bulk_add_items():
-    items = request.json['items']
+    items = request.json.get('items', [])
+    if not items:
+        return jsonify({'error': 'No items provided'}), 400
+
     for item in items:
+        # Validate item fields here
         new_item = FridgeItem(
             name=item['name'],
             expiration_date=item['expiration_date'],
@@ -260,7 +266,7 @@ def bulk_add_items():
     return jsonify({'status': 'Items added'}), 201
 
 
-@app.route('/api/fridge/bulk_remove', methods=['POST'])
+@main.route('/api/fridge/bulk_remove', methods=['POST'])
 @login_required
 def bulk_remove_items():
     item_ids = request.json['item_ids']
@@ -271,21 +277,21 @@ def bulk_remove_items():
 
 @main.errorhandler(400)
 def handle_400(error):
-    return jsonify({'error': 'Bad Request'}), 400
+    return jsonify({f'{error}': 'Bad Request'}), 400
 
 
 @main.errorhandler(401)
 def handle_401(error):
-    return jsonify({'error': 'Unauthorized'}), 401
+    return jsonify({f'{error}': 'Unauthorized'}), 401
 
 
 @main.errorhandler(404)
 def handle_404(error):
     logger.warning('404 error occurred')
-    return jsonify({'error': 'Resource not found'}), 404
+    return jsonify({f'{error}': 'Resource not found}'}), 404
 
 
 @main.errorhandler(500)
 def handle_500(error):
     logger.critical('500 error occurred', exc_info=True)
-    return jsonify({'error': 'An internal error occurred'}), 500
+    return jsonify({f'{error}': 'An internal error occurred'}), 500

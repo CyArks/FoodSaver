@@ -5,6 +5,7 @@ logger = logging.getLogger(__name__)  # Added for logging
 # Setup cache with 1000 item limit and 3 minutes time-to-live (TTL)
 offers_cache = TTLCache(maxsize=1000, ttl=180)
 
+
 @cached(cache=offers_cache)
 def get_offer(offer_id):
     """
@@ -17,6 +18,7 @@ def get_offer(offer_id):
         "title": "Sample Offer",
         "description": "This is a sample offer."
     }
+
 
 def invalidate_offer_cache(offer_id):
     if offer_id in offers_cache:

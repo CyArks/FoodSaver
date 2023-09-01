@@ -1,4 +1,11 @@
+# from flask import Flask
+# from flask_restful import Resource, Api
+# from flask_limiter import Limiter
+# from flask_limiter.util import get_remote_address
+
+from flask import jsonify
 from flask_principal import Permission, RoleNeed
+import logging
 
 # Define some basic roles and permissions
 admin_permission = Permission(RoleNeed('admin'))
@@ -7,14 +14,14 @@ user_permission = Permission(RoleNeed('user'))
 
 def configure_permissions(app):
     """Configure permissions for the given app."""
-    from flask_principal import identity_loaded
-    
+    from flask_principal import identity_loaded, UserNeed
+
     @identity_loaded.connect_via(app)
     def on_identity_loaded(sender, identity):
         """Load the user's roles into the identity object."""
         # Set the identity user object
         identity.user = sender.current_user
-        
+
         # Add the UserNeed to the identity
         if hasattr(sender.current_user, 'id'):
             identity.provides.add(UserNeed(sender.current_user.id))
@@ -25,11 +32,17 @@ def configure_permissions(app):
                 identity.provides.add(RoleNeed(role.name))
 
 
+# Initialize logging
+logging.basicConfig(level=logging.INFO)
+
+
 def require_admin():
     if not admin_permission.can():
-        abort(403)
+        logging.warning('Unauthorized admin access attempt.')
+        return jsonify({'error': 'You do not have admin permissions'}), 403
 
 
 def require_user():
     if not user_permission.can():
-        abort(403)
+        logging.warning('Unauthorized user access attempt.')
+        return jsonify({'error': 'You do not have user permissions'}), 403
