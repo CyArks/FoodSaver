@@ -1,6 +1,6 @@
 import requests
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token
 from app.cache_manager import get_offer, invalidate_offer_cache
 from .permissions import admin_permission
 from flask_login import login_required, current_user
@@ -20,6 +20,20 @@ logger = logging.getLogger(__name__)
 @main.route('/')
 def home():
     return jsonify({'message': 'Welcome to the Home Page'})
+
+
+@main.route('/login', methods=['POST'])
+def login():
+    data = request.json
+    username = data.get('username', None)
+    password = data.get('password', None)
+
+    # Replace with your actual user authentication logic
+    if username == "your_username" and password == "your_password":
+        access_token = create_access_token(identity=username)
+        return jsonify(access_token=access_token), 200
+
+    return jsonify({"msg": "Invalid username or password"}), 401
 
 
 @main.route('/api/fetch_deals', methods=['GET'])
