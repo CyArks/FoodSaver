@@ -35,17 +35,22 @@ class User(db.Model):
     def find_by_id(cls, user_id):
         return cls.query.filter_by(id=user_id).first()
 
-class Fridge(db.Model):
+
+class FridgeItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    item_name = db.Column(db.String(64), index=True)
-    item_weight = db.Column(db.Float)
-    expiration_date = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    name = db.Column(db.String(50), nullable=False)
+    expiration_date = db.Column(db.Date, nullable=False)
+    weight = db.Column(db.Float, nullable=True)
+    category = db.Column(db.String(50), nullable=True)
+    unit = db.Column(db.String(10), nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
 
 class DietaryPreferences(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     preference = db.Column(db.String(64), index=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
 
 class Recipes(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -53,17 +58,20 @@ class Recipes(db.Model):
     ingredients = db.Column(db.String(256))
     ratings = db.relationship('Ratings', backref='recipe', lazy='dynamic')
 
+
 class Ratings(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     rating = db.Column(db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     recipe_id = db.Column(db.Integer, db.ForeignKey('recipes.id'))
 
+
 class Notifications(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     message = db.Column(db.String(256))
     sent_at = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
 
 class WasteTracking(db.Model):
     __tablename__ = 'waste_tracking'
@@ -92,6 +100,7 @@ class Recipe(db.Model):
     # Assuming each recipe can have multiple ratings
     ratings = db.relationship("RecipeRating", back_populates="recipe")
 
+
 class RecipeRating(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     rating = db.Column(db.Float)
@@ -100,14 +109,16 @@ class RecipeRating(db.Model):
 
     user = db.relationship("User", back_populates="recipe_ratings")
     recipe = db.relationship("Recipe", back_populates="ratings")
-    
+
+
 class MealPlan(db.Model):
     __tablename__ = 'meal_plans'
-    
+
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     recipe_ids = db.Column(db.String(500), nullable=True)  # Comma-separated list of recipe IDs
     date = db.Column(db.DateTime, default=datetime.utcnow)
+
 
 class GroceryList(db.Model):
     __tablename__ = 'grocery_lists'
@@ -115,4 +126,3 @@ class GroceryList(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     items = db.Column(db.String(500), nullable=True)  # Comma-separated list of items
-
