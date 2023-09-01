@@ -1,41 +1,42 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const Profile = () => {
-  const [profileData, setProfileData] = useState({});
+const ProfileComponent = () => {
+  const [profile, setProfile] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      const token = localStorage.getItem('jwtToken');
-      const config = {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      };
-
+    const fetchData = async () => {
       try {
-        const response = await axios.get('/api/profile', config);
-        setProfileData(response.data);
-      } catch (error) {
-        if (error.response.status === 401) {
-          localStorage.removeItem('jwtToken');
-          alert('Unauthorized. Please login again.');
-        } else {
-          alert('An error occurred');
+        // Replace with your API endpoint
+        const response = await axios.get('/api/profile');
+        if (response.status === 200) {
+          setProfile(response.data);
+          setIsLoading(false);
         }
+      } catch (error) {
+        alert('An error occurred while fetching the profile');
+        setIsLoading(false);
       }
     };
-
-    fetchProfile();
+    fetchData();
   }, []);
 
   return (
     <div>
-      <h1>{profileData.name}</h1>
-      <p>{profileData.email}</p>
-      {/* Add more profile fields here */}
+      <h1>Your Profile</h1>
+      {isLoading ? (
+        <p>Loading...</p>
+      ) : (
+        <div>
+          <p>Name: {profile.name}</p>
+          <p>Email: {profile.email}</p>
+          <p>Sustainability Score: {profile.sustainability_score}</p>
+          {/* Add more profile details here */}
+        </div>
+      )}
     </div>
   );
 };
 
-export default Profile;
+export default ProfileComponent;

@@ -1,24 +1,36 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
-const FridgeComponent = ({ items }) => {
-    if (!items) {
-        return <div className="fridge">Loading...</div>;
-    }
+const FridgeComponent = () => {
+  const [items, setItems] = useState([]);
 
-    if (items.length === 0) {
-        return <div className="fridge">Your fridge is empty.</div>;
-    }
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Replace with your API endpoint
+        const response = await axios.get('/api/fridge');
+        if (response.status === 200) {
+          setItems(response.data);
+        }
+      } catch (error) {
+        alert('An error occurred while fetching fridge items');
+      }
+    };
+    fetchData();
+  }, []);
 
-    return (
-        <div className="fridge">
-            {items.map((item) => (
-                <div key={item.id} className="fridge-item">
-                    <span>{item.name}</span>
-                    <span>Expires on: {item.expirationDate}</span>
-                </div>
-            ))}
-        </div>
-    );
+  return (
+    <div>
+      <h1>Your Fridge</h1>
+      <ul>
+        {items.map((item, index) => (
+          <li key={index}>
+            {item.name} - {item.weight}g
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 };
 
 export default FridgeComponent;

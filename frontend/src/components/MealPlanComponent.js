@@ -1,51 +1,36 @@
 import React, { useState, useEffect } from 'react';
-import MealPlanComponent from '../components/MealPlanComponent';
+import axios from 'axios';
 
-// MealPlanPage is responsible for managing the meal plans
-const MealPlanPage = () => {
-  // State to hold the meal plans
+const MealPlanComponent = () => {
   const [mealPlans, setMealPlans] = useState([]);
-  // State to hold the new meal plan to be added
-  const [newMealPlan, setNewMealPlan] = useState('');
 
-  // Function to fetch meal plans from the backend
-  const fetchMealPlans = async () => {
-    // TODO: Make an API call to fetch meal plans from the backend
-    // For now, we'll use some dummy data
-    const dummyMealPlans = ['Meal Plan 1', 'Meal Plan 2'];
-    setMealPlans(dummyMealPlans);
-  };
-
-  // Fetch meal plans when the component mounts
   useEffect(() => {
-    fetchMealPlans();
+    const fetchData = async () => {
+      try {
+
+        const response = await axios.get('/api/meal_plan');
+        if (response.status === 200) {
+          setMealPlans(response.data);
+        }
+      } catch (error) {
+        alert('An error occurred while fetching the meal plans');
+      }
+    };
+    fetchData();
   }, []);
-
-  // Function to add a new meal plan
-  const addMealPlan = () => {
-    if (newMealPlan === '') {
-      alert('Meal Plan cannot be empty');
-      return;
-    }
-
-    // TODO: Make an API call to add the meal plan in the backend
-    // For now, we'll just add it to the local state
-    setMealPlans([...mealPlans, newMealPlan]);
-    setNewMealPlan('');
-  };
 
   return (
     <div>
-      <MealPlanComponent mealPlans={mealPlans} />
-      <input
-        type="text"
-        value={newMealPlan}
-        onChange={(e) => setNewMealPlan(e.target.value)}
-        placeholder="Add a new meal plan"
-      />
-      <button onClick={addMealPlan}>Add Meal Plan</button>
+      <h1>Your Meal Plans</h1>
+      <ul>
+        {mealPlans.map((plan, index) => (
+          <li key={index}>
+            {plan.name} - {plan.description}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };
 
-export default MealPlanPage;
+export default MealPlanComponent;

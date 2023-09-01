@@ -1,51 +1,36 @@
 import React, { useState, useEffect } from 'react';
-import GroceryListComponent from '../components/GroceryListComponent';
+import axios from 'axios';
 
-// GroceryListPage is responsible for managing the grocery lists
-const GroceryListPage = () => {
-  // State to hold the grocery lists
-  const [groceryLists, setGroceryLists] = useState([]);
-  // State to hold the new grocery list to be added
-  const [newGroceryList, setNewGroceryList] = useState('');
+const GroceryListComponent = () => {
+  const [groceryList, setGroceryList] = useState([]);
 
-  // Function to fetch grocery lists from the backend
-  const fetchGroceryLists = async () => {
-    // TODO: Make an API call to fetch grocery lists from the backend
-    // For now, we'll use some dummy data
-    const dummyGroceryLists = ['Grocery List 1', 'Grocery List 2'];
-    setGroceryLists(dummyGroceryLists);
-  };
-
-  // Fetch grocery lists when the component mounts
   useEffect(() => {
-    fetchGroceryLists();
+    const fetchData = async () => {
+      try {
+        // Replace with your API endpoint
+        const response = await axios.get('/api/grocery_list');
+        if (response.status === 200) {
+          setGroceryList(response.data);
+        }
+      } catch (error) {
+        alert('An error occurred while fetching the grocery list');
+      }
+    };
+    fetchData();
   }, []);
-
-  // Function to add a new grocery list
-  const addGroceryList = () => {
-    if (newGroceryList === '') {
-      alert('Grocery List cannot be empty');
-      return;
-    }
-
-    // TODO: Make an API call to add the grocery list in the backend
-    // For now, we'll just add it to the local state
-    setGroceryLists([...groceryLists, newGroceryList]);
-    setNewGroceryList('');
-  };
 
   return (
     <div>
-      <GroceryListComponent groceryLists={groceryLists} />
-      <input
-        type="text"
-        value={newGroceryList}
-        onChange={(e) => setNewGroceryList(e.target.value)}
-        placeholder="Add a new grocery list"
-      />
-      <button onClick={addGroceryList}>Add Grocery List</button>
+      <h1>Your Grocery List</h1>
+      <ul>
+        {groceryList.map((item, index) => (
+          <li key={index}>
+            {item.name} - {item.weight}g
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };
 
-export default GroceryListPage;
+export default GroceryListComponent;
