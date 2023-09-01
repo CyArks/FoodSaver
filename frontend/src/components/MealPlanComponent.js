@@ -3,17 +3,20 @@ import axios from 'axios';
 
 const MealPlanComponent = () => {
   const [mealPlans, setMealPlans] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-
+        // Replace with your API endpoint
         const response = await axios.get('/api/meal_plan');
         if (response.status === 200) {
           setMealPlans(response.data);
+          setIsLoading(false);
         }
       } catch (error) {
         alert('An error occurred while fetching the meal plans');
+        setIsLoading(false);
       }
     };
     fetchData();
@@ -21,14 +24,20 @@ const MealPlanComponent = () => {
 
   return (
     <div>
-      <h1>Your Meal Plans</h1>
-      <ul>
-        {mealPlans.map((plan, index) => (
-          <li key={index}>
-            {plan.name} - {plan.description}
-          </li>
-        ))}
-      </ul>
+      <h1>Meal Plans</h1>
+      {isLoading ? (
+        <p>Loading...</p>
+      ) : (
+        <div>
+          {mealPlans.map((plan, index) => (
+            <div key={index}>
+              <h2>{plan.name}</h2>
+              <p>Recipes: {plan.recipes.join(', ')}</p>
+              {/* Add more meal plan details here */}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

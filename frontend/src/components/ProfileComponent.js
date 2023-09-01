@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const ProfileComponent = () => {
-  const [profile, setProfile] = useState({});
+const MealPlanComponent = () => {
+  const [mealPlans, setMealPlans] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         // Replace with your API endpoint
-        const response = await axios.get('/api/profile');
+        const response = await axios.get('/api/meal_plan');
         if (response.status === 200) {
-          setProfile(response.data);
+          setMealPlans(response.data);
           setIsLoading(false);
         }
       } catch (error) {
-        alert('An error occurred while fetching the profile');
+        alert('An error occurred while fetching the meal plans');
         setIsLoading(false);
       }
     };
@@ -24,19 +24,22 @@ const ProfileComponent = () => {
 
   return (
     <div>
-      <h1>Your Profile</h1>
+      <h1>Meal Plans</h1>
       {isLoading ? (
         <p>Loading...</p>
       ) : (
         <div>
-          <p>Name: {profile.name}</p>
-          <p>Email: {profile.email}</p>
-          <p>Sustainability Score: {profile.sustainability_score}</p>
-          {/* Add more profile details here */}
+          {mealPlans.map((plan, index) => (
+            <div key={index}>
+              <h2>{plan.name}</h2>
+              <p>Recipes: {plan.recipes.join(', ')}</p>
+              {/* Add more meal plan details here */}
+            </div>
+          ))}
         </div>
       )}
     </div>
   );
 };
 
-export default ProfileComponent;
+export default MealPlanComponent;

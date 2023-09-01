@@ -29,6 +29,7 @@ const GroceryListPage = () => {
     }
 
     // TODO: Make an API call to add the grocery list in the backend
+    // Import list settings -> User file share FTP?
     // For now, we'll just add it to the local state
     setGroceryLists([...groceryLists, newGroceryList]);
     setNewGroceryList('');

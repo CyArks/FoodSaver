@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const GroceryListComponent = () => {
-  const [groceryList, setGroceryList] = useState([]);
+  const [groceryLists, setGroceryLists] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -10,10 +11,12 @@ const GroceryListComponent = () => {
         // Replace with your API endpoint
         const response = await axios.get('/api/grocery_list');
         if (response.status === 200) {
-          setGroceryList(response.data);
+          setGroceryLists(response.data);
+          setIsLoading(false);
         }
       } catch (error) {
-        alert('An error occurred while fetching the grocery list');
+        alert('An error occurred while fetching the grocery lists');
+        setIsLoading(false);
       }
     };
     fetchData();
@@ -21,14 +24,21 @@ const GroceryListComponent = () => {
 
   return (
     <div>
-      <h1>Your Grocery List</h1>
-      <ul>
-        {groceryList.map((item, index) => (
-          <li key={index}>
-            {item.name} - {item.weight}g
-          </li>
-        ))}
-      </ul>
+      <h1>Grocery Lists</h1>
+      {isLoading ? (
+        <p>Loading...</p>
+      ) : (
+        <div>
+          {groceryLists.map((list, index) => (
+            <div key={index}>
+              <h2>{list.name}</h2>
+              <p>Items: {list.items.join(', ')}</p>
+              <p>Weight: {list.weight} kg</p>
+              {/* Add more grocery list details here */}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
