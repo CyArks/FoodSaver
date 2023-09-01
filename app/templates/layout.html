@@ -4,16 +4,28 @@
     <meta charset="UTF-8">
     <title>{% block title %}FoodSaver{% endblock %}</title>
     <style>
+        /* Global Styles */
         body {
             background-color: #2c2c2c;
             color: #ffffff;
             font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
         }
         header {
             background-color: #1a1a1a;
             padding: 1em;
             text-align: center;
         }
+        footer {
+            background-color: #1a1a1a;
+            padding: 1em;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+        /* Navigation Styles */
         nav {
             text-align: center;
             background-color: #333;
@@ -27,23 +39,35 @@
         nav a:hover {
             background-color: #555;
         }
+        /* Main Content Styles */
         main {
             padding: 20px;
+            min-height: calc(100vh - 2em - 1em);  /* Adjust based on header and footer height */
         }
     </style>
 </head>
 <body>
+    <!-- Header -->
     <header>
         <h1>{% block header %}FoodSaver{% endblock %}</h1>
     </header>
+
+    <!-- Navigation -->
     <nav>
         <a href="/">Home</a>
         <a href="/login">Login</a>
         <a href="/register">Register</a>
         <!-- Add more links based on your routes -->
     </nav>
+
+    <!-- Main Content -->
     <main>
         {% block content %}{% endblock %}
     </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2023 FoodSaver. All rights reserved.</p>
+    </footer>
 </body>
 </html>

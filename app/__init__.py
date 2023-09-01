@@ -1,9 +1,9 @@
 from flask_jwt_extended import JWTManager
-
 from config import DevelopmentConfig, ProductionConfig
 from logging.handlers import RotatingFileHandler
 from flask import Flask, jsonify
 from app.routes import main
+from models import db
 import logging
 import os
 
@@ -21,9 +21,9 @@ def create_app():
         app.config.from_object(DevelopmentConfig)
 
     app.register_blueprint(main)
+
     # Initialize other extensions'
-    # db.init_app(app)
-    # login_manager.init_app(app)
+    db.init_app(app)
 
     # Configure logging
     handler = RotatingFileHandler("app.log", maxBytes=10000, backupCount=3)

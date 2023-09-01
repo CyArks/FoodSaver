@@ -1,3 +1,4 @@
+import os
 import requests
 from flask import Blueprint, jsonify, request, render_template, make_response
 from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token
@@ -19,29 +20,48 @@ logger = logging.getLogger(__name__)
 
 @main.route('/')
 def home():
-    logging.info({'message': 'Welcome to the Home Page'})
+    resp = make_response(render_template('layout.html'))
+    # Modify resp here if needed, e.g., set a cookie
+    return resp, 200
 
 
-@main.route('/login', methods=['POST'])
+@main.route('/debug')
+def debug_route():
+    template_folder_path = os.path.join(os.getcwd(), 'templates')
+    return f"Template folder path: {template_folder_path}"
+
+
+@main.route('/login', methods=['GET', 'POST'])
 def login():
-    data = request.json
-    username = data.get('username', None)
-    password = data.get('password', None)
+    if request.method == 'POST':
+        # Handle login
+        username = request.form['username']
+        password = request.form['password']
 
-    # Replace with your actual user authentication logic
-    if username == "your_username" and password == "your_password":
-        access_token = create_access_token(identity=username)
+        # Fetch user from database
+        user = User.query.filter_by(username=username).first()
 
-        # Create response object
-        resp = make_response(render_template('dashboard.html'))
+        # Validate user
+        if user and user.check_password(password):
+            access_token = create_access_token(identity=username)
 
-        # Set cookie with the access_token
-        resp.set_cookie('access_token', access_token)
+            # Create response object
+            resp = make_response(render_template('dashboard.html'))
 
-        return resp, 200
+            # Set cookie with the access_token
+            resp.set_cookie('access_token', access_token)
 
-    logging.info({"msg": "Invalid username or password"})
-    return render_template('login.html', error="Invalid username or password"), 401
+            return resp, 200
+
+        logging.info({"msg": "Invalid username or password"})
+        return render_template('login.html', error="Invalid username or password"), 401
+
+    # Handle GET request
+    return render_template('login.html')
+
+
+    # Handle GET request
+    return render_template('login.html')
 
 
 @main.route('/api/fetch_deals', methods=['GET'])
@@ -59,7 +79,7 @@ def fetch_deals():
     }
 
     logging.info(processed_data), 200
-    
+
 
 waste_schema = {
     "type": "object",
@@ -104,7 +124,7 @@ def track_waste():
     # Update the sustainability score here based on the action
     new_score = calculate_sustainability_score(current_user.id)
     current_user.sustainability_score = new_score
-    
+
     db.session.commit()
     logging.info({'status': 'Waste tracked', 'new_score': new_score}), 201
 
@@ -122,6 +142,11 @@ def create_recipe():
     db.session.add(new_recipe)
     db.session.commit()
     logging.info({'status': 'Recipe created'}), 201
+
+    # Create response object
+    resp = make_response(render_template('recipes.html'))
+
+    return resp, 201
 
 
 @main.route('/api/recipes', methods=['GET'])
@@ -143,11 +168,11 @@ def get_single_recipe(recipe_id):
 def secure_route():
     current_user_id = get_jwt_identity()
     user = User.find_by_id(current_user_id)
-    
+
     if not user:
         logger.warning(f'User not found: {current_user_id}')
         logging.info({'message': 'User not found'}), 404
-    
+
     logging.info({'message': 'This is a secure route'})
 
 
@@ -169,16 +194,16 @@ def admin_route():
 def change_password():
     current_user_id = get_jwt_identity()
     user = User.find_by_id(current_user_id)
-    
+
     data = request.get_json()
     new_password = data['new_password']
-    
+
     if not user.change_password(new_password):
         logger.error(f'Failed to change password for user: {current_user_id}')
         logging.info({'message': 'Could not change password'}), 500
-    
+
     # Additional code for invalidating JWT tokens goes here
-    
+
     logging.info({'message': 'Password changed successfully'})
 
 
@@ -228,9 +253,9 @@ def search_recipes():
     sort_by_rating = request.args.get('sort_by_rating')
     if sort_by_rating:
         query = query.order_by(Recipe.rating.desc())
-        
+
     # Add more filters as neded
-    
+
     recipes = query.all()
     logging.info([recipe.serialize() for recipe in recipes])
 
@@ -250,6 +275,11 @@ def create_meal_plan():
     db.session.add(new_plan)
     db.session.commit()
     logging.info({'status': 'Meal plan created'}), 201
+
+    # Create response object
+    resp = make_response(render_template('meal_plans.html'))
+
+    return resp, 201
 
 
 @main.route('/api/meal_plan', methods=['GET'])
@@ -320,7 +350,24 @@ def bulk_remove_items():
     return render_template('login.html')
 
 
-# ToDo: Register route!
+@main.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        data = request.form
+        username = data.get('username', None)
+        email = data.get('email', None)
+        password = data.get('password', None)
+
+        # Add your actual user registration logic here
+        # For example, you might want to add the new user to your database
+        new_user = User(username=username, email=email, password=password)
+        db.session.add(new_user)
+        db.session.commit()
+
+        logging.info({"msg": "User registered successfully"})
+        return render_template('dashboard.html', username=username), 200
+
+    return render_template('register.html')
 
 
 @main.errorhandler(400)

@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <!-- Main Container -->
+    <div style="background-color: #333; color: white; padding: 20px; font-family: Arial, sans-serif;">
+
+        <!-- Navigation Bar -->
+        <div style="background-color: #444; padding: 10px;">
+            <a href="#" style="margin-right: 20px; color: white; text-decoration: none;">Home</a>
+            <a href="#" style="margin-right: 20px; color: white; text-decoration: none;">About</a>
+            <a href="#" style="margin-right: 20px; color: white; text-decoration: none;">Contact</a>
+        </div>
+
+        <!-- Header -->
+        <h1 style="font-size: 36px; margin-bottom: 20px;">Welcome to FoodSaver!</h1>
+
+        <!-- Introduction -->
+        <p style="font-size: 18px; margin-bottom: 20px;">This is the main index page of your application.</p>
+
+        <!-- Dynamic Content -->
+        <div id="dynamic-content" style="border: 2px solid #555; padding: 20px; margin-bottom: 20px;">
+            Placeholder content that can be updated dynamically.
+        </div>
+
+        <!-- Additional Sections -->
+        <div style="display: flex; justify-content: space-between;">
+            <div style="width: 48%; background-color: #444; padding: 20px;">
+                <h2>Section 1</h2>
+                <p>Additional content can go here.</p>
+            </div>
+            <div style="width: 48%; background-color: #444; padding: 20px;">
+                <h2>Section 2</h2>
+                <p>Additional content can go here.</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div style="background-color: #444; padding: 10px; margin-top: 20px;">
+            <p style="text-align: center;">&copy; 2023 FoodSaver. All rights reserved.</p>
+        </div>
+    </div>
+{% endblock %}

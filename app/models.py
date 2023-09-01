@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
-from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
 
 db = SQLAlchemy()
 
@@ -15,12 +15,13 @@ class User(db.Model):
     password_hash = db.Column(db.String(128), nullable=False)
     role = db.Column(db.String(50), nullable=False, default='user')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    fridge = db.relationship('Fridge', backref='owner', lazy='dynamic')
+    fridge = db.relationship('FridgeItem', backref='owner', lazy='dynamic')
     dietary_preferences = db.relationship('DietaryPreferences', backref='owner', lazy='dynamic')
     ratings = db.relationship('Ratings', backref='rater', lazy='dynamic')
     meal_plans = db.relationship("MealPlan", backref="user")
     grocery_lists = db.relationship("GroceryList", backref="user")
     recipes = db.relationship("Recipe", back_populates="user")
+    recipe_ratings = db.relationship("RecipeRating", back_populates="user")
     waste_actions = db.relationship("WasteTracking", back_populates="user")
 
     def set_password(self, password):
@@ -45,7 +46,7 @@ class FridgeItem(db.Model):
     weight = db.Column(db.Float, nullable=True)
     category = db.Column(db.String(50), nullable=True)
     unit = db.Column(db.String(10), nullable=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
 
 class DietaryPreferences(db.Model):
