@@ -28,6 +28,7 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
 
+    app.register_blueprint(main)
     app.register_blueprint(auth_blueprint, url_prefix='/auth')  # Register the auth_blueprint
 
     # Initialize other extensions'
