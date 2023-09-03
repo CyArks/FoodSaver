@@ -6,10 +6,13 @@ from flask import Flask, jsonify
 from app.routes import auth_blueprint
 from app.routes import main
 from models import db
+from flask_caching import Cache
+from flask_pymongo import PyMongo
 import logging
 import os
 
 
+mongo = PyMongo()
 migrate = Migrate()
 
 
@@ -24,8 +27,10 @@ def create_app():
         app.config.from_object(DevelopmentConfig)
 
     jwt = JWTManager(app)
+    cache = Cache(app)
 
     db.init_app(app)
+    mongo.init_app(app, uri="mongodb://localhost:27017/foodsaver")
     migrate.init_app(app, db)
 
     app.register_blueprint(main)

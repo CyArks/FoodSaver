@@ -3,11 +3,14 @@ import requests
 from flask import Blueprint, jsonify, request, render_template, make_response
 from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token
 from app.cache_manager import get_offer, invalidate_offer_cache
-from .permissions import admin_permission
+from app.permissions import admin_permission
 from flask_login import login_required, current_user
-from .rate_limiter import limiter
-from .models import Recipe, db
-from models import User, FridgeItem, GroceryList, MealPlan, WasteTracking
+from app.rate_limiter import limiter
+from app.models import Recipe, db
+from flask_pymongo import PyMongo
+from app.models import User, FridgeItem, GroceryList, MealPlan, WasteTracking
+from marshmallow import Schema, fields, validate
+from flask import current_app as app  # Import current_app
 from jsonschema import validate, ValidationError
 import logging
 
@@ -16,7 +19,12 @@ main = Blueprint('main', __name__)
 
 # Logger setup
 logger = logging.getLogger(__name__)
+mongo = PyMongo(app, uri="mongodb://localhost:27017/foodsaver")
 auth_blueprint = Blueprint('auth', __name__)
+
+
+class GroceryListSchema(Schema):
+    name = fields.Str(required=True, validate=validate.length(min=1))
 
 
 @main.route('/')
@@ -186,23 +194,31 @@ def admin_route():
     logging.info({'message': 'This is an admin route'})
 
 
-# ToDo: Look at the following route and add / improve code: Add models.py/User/set_Password
 @main.route('/change_password', methods=['POST'])
 @jwt_required()
 def change_password():
     current_user_id = get_jwt_identity()
     user = User.find_by_id(current_user_id)
 
+    if not user:
+        return jsonify({'message': 'User not found'}), 404
+
     data = request.get_json()
-    new_password = data['new_password']
+    new_password = data.get('new_password')
 
-    if not user.change_password(new_password):
-        logger.error(f'Failed to change password for user: {current_user_id}')
-        logging.info({'message': 'Could not change password'}), 500
+    if not new_password:
+        return jsonify({'message': 'New password is required'}), 400
 
-    # Additional code for invalidating JWT tokens goes here
+    if user.change_password(new_password):
+        # Log the successful password change
+        logging.info(f'Password changed successfully for user: {current_user_id}')
 
-    logging.info({'message': 'Password changed successfully'})
+        # Additional code for invalidating JWT tokens goes here
+
+        return jsonify({'message': 'Password changed successfully'}), 200
+    else:
+        logging.error(f'Failed to change password for user: {current_user_id}')
+        return jsonify({'message': 'Could not change password'}), 500
 
 
 @main.route('/admin')
@@ -295,11 +311,20 @@ def create_grocery_list():
     logging.info({'status': 'Grocery list created'}), 201
 
 
-@main.route('/api/grocery_list', methods=['GET'])
-@login_required
+@app.route('/grocery-lists', methods=['GET'])
 def get_grocery_lists():
-    lists = GroceryList.query.filter_by(user_id=current_user.id).all()
-    logging.info([item.serialize() for item in lists]), 200
+    page = int(request.args.get('page', 1))
+    per_page = int(request.args.get('per_page', 10))
+    offset = (page - 1) * per_page
+    grocery_lists = mongo.db.grocery_lists.find().skip(offset).limit(per_page)
+    return jsonify(list(grocery_lists))
+
+
+@app.route('/search-grocery-lists', methods=['GET'])
+def search_grocery_lists():
+    query = request.args.get('query')
+    grocery_lists = mongo.db.grocery_lists.find({"name": {"$regex": query}})
+    return jsonify(list(grocery_lists))
 
 
 @main.route('/api/update_profile', methods=['POST'])
@@ -348,21 +373,20 @@ def bulk_remove_items():
 
 @main.route('/register', methods=['GET', 'POST'])
 def register():
-    if request.method == 'POST':
-        data = request.form
-        username = data.get('username', None)
-        email = data.get('email', None)
-        password = data.get('password', None)
+    with app.app_context():  # Explicitly specify app context
+        if request.method == 'POST':
+            data = request.form
+            username = data.get('username', None)
+            email = data.get('email', None)
+            password = data.get('password', None)
 
-        # Add your actual user registration logic here
-        # For example, you might want to add the new user to your database
-        new_user = User(username=username, email=email)
-        new_user.set_password(password)
-        db.session.add(new_user)
-        db.session.commit()
+            new_user = User(username=username, email=email)
+            new_user.set_password(password)
+            db.session.add(new_user)
+            db.session.commit()
 
-        logging.info({"msg": "User registered successfully"})
-        return render_template('dashboard.html', username=username), 200
+            logging.info({"msg": "User registered successfully"})
+            return render_template('dashboard.html', username=username), 200
 
     return render_template('register.html')
 

@@ -1,9 +1,13 @@
 /* styles.css */
 
+:root {
+  --bg-color: #FFF;
+  --text-color: #333;
+}
+
 body {
-    background-color: #333;
-    color: #fff;
-    font-family: Arial, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
 }
 
 h2 {

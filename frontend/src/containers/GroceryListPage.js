@@ -1,50 +1,75 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import GroceryListComponent from '../components/GroceryListComponent';
 
-// GroceryListPage is responsible for managing the grocery lists
 const GroceryListPage = () => {
-  // State to hold the grocery lists
   const [groceryLists, setGroceryLists] = useState([]);
-  // State to hold the new grocery list to be added
   const [newGroceryList, setNewGroceryList] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  // Function to fetch grocery lists from the backend
   const fetchGroceryLists = async () => {
-    // TODO: Make an API call to fetch grocery lists from the backend
-    // For now, we'll use some dummy data
-    const dummyGroceryLists = ['Grocery List 1', 'Grocery List 2'];
-    setGroceryLists(dummyGroceryLists);
+    setIsLoading(true);
+    try {
+      const response = await axios.get('/api/get_grocery_lists', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      setGroceryLists(response.data);
+    } catch (error) {
+      setErrorMessage('Failed to fetch grocery lists');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // Fetch grocery lists when the component mounts
   useEffect(() => {
     fetchGroceryLists();
   }, []);
 
-  // Function to add a new grocery list
-  const addGroceryList = () => {
-    if (newGroceryList === '') {
-      alert('Grocery List cannot be empty');
-      return;
+  const validateInput = () => {
+    if (newGroceryList.trim() === '') {
+      setErrorMessage('Grocery List cannot be empty');
+      return false;
     }
+    return true;
+  };
 
-    // TODO: Make an API call to add the grocery list in the backend
-    // Import list settings -> User file share FTP?
-    // For now, we'll just add it to the local state
-    setGroceryLists([...groceryLists, newGroceryList]);
-    setNewGroceryList('');
+  const addGroceryList = async () => {
+    if (!validateInput()) return;
+
+    try {
+      await axios.post('/api/create_grocery_list', { name: newGroceryList }, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      setNewGroceryList('');
+      setErrorMessage('');
+      fetchGroceryLists();  // Refresh the list
+    } catch (error) {
+      setErrorMessage('Failed to add grocery list');
+    }
   };
 
   return (
     <div>
-      <GroceryListComponent groceryLists={groceryLists} />
-      <input
-        type="text"
-        value={newGroceryList}
-        onChange={(e) => setNewGroceryList(e.target.value)}
-        placeholder="Add a new grocery list"
-      />
-      <button onClick={addGroceryList}>Add Grocery List</button>
+      {isLoading ? (
+        <p>Loading...</p>
+      ) : (
+        <>
+          <GroceryListComponent groceryLists={groceryLists} />
+          <input
+            type="text"
+            value={newGroceryList}
+            onChange={(e) => setNewGroceryList(e.target.value)}
+            placeholder="Add a new grocery list"
+          />
+          <button onClick={addGroceryList}>Add Grocery List</button>
+          {errorMessage && <p className="error-message">{errorMessage}</p>}
+        </>
+      )}
     </div>
   );
 };
