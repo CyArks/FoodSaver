@@ -15,6 +15,9 @@ migrate = Migrate()
 
 
 def create_app():
+    import pdb
+    pdb.set_trace()
+
     app = Flask(__name__)
     app.config['JWT_SECRET_KEY'] = 'your-secret-key'
     app.config['JWT_TOKEN_LOCATION'] = ['headers']
@@ -27,6 +30,8 @@ def create_app():
     jwt = JWTManager(app)
     cache = Cache(app)
 
+    jwt.init_app(app)
+    cache.init_app(app)
     db.init_app(app)
     migrate.init_app(app, db)
 
@@ -58,4 +63,4 @@ def create_app():
 
 if __name__ == '__main__':
     app = create_app()
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5001, debug=True)

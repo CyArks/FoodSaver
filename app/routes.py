@@ -9,19 +9,15 @@ from app.rate_limiter import limiter
 from app.models import Recipe, db
 from app.models import User, FridgeItem, GroceryList, MealPlan, WasteTracking
 from marshmallow import validate
-from flask import current_app as app  # Import current_app
 from jsonschema import validate, ValidationError
 import logging
 
 # Create Blueprint
 main = Blueprint('main', __name__)
+auth_blueprint = Blueprint('auth', __name__)
 
 # Logger setup
 logger = logging.getLogger(__name__)
-
-
-with app.app_context():
-    auth_blueprint = Blueprint('auth', __name__)
 
 
 @main.route('/')
@@ -298,18 +294,42 @@ def get_meal_plans():
     logging.info([plan.serialize() for plan in plans]), 200
 
 
-@main.route('/api/grocery_list', methods=['POST'])
+@main.route('/grocery-lists', methods=['GET', 'POST'])
 @login_required
-@main.route('/grocery-lists', methods=['GET'])
-def get_grocery_lists():
-    page = int(request.args.get('page', 1))
-    per_page = int(request.args.get('per_page', 10))
-    pagination = GroceryList.query.paginate(page, per_page, False)
-    grocery_lists = pagination.items
-    return jsonify([grocery_list.serialize() for grocery_list in grocery_lists])
+def handle_grocery_lists():
+    if request.method == 'POST':
+        data = request.json
+        name = data.get('name')
+        items = data.get('items')
+
+        # Validation
+        if not name or not items:
+            return jsonify({"error": "Name and items are required"}), 400
+
+        # Create a new GroceryList object and save it to the database
+        new_grocery_list = GroceryList(name=name, items=items, user_id=current_user.id)
+        db.session.add(new_grocery_list)
+        db.session.commit()
+
+        return jsonify({"message": "Grocery list created successfully"}), 201
+
+    elif request.method == 'GET':
+        # Fetch all grocery lists for the current user from the database
+        grocery_lists = GroceryList.query.filter_by(user_id=current_user.id).all()
+
+        # Prepare the output
+        output = []
+        for grocery_list in grocery_lists:
+            list_data = {}
+            list_data['id'] = grocery_list.id
+            list_data['name'] = grocery_list.name
+            list_data['items'] = grocery_list.items
+            output.append(list_data)
+
+        return jsonify({"grocery_lists": output}), 200
 
 
-@app.route('/search-grocery-lists', methods=['GET'])
+@main.route('/search-grocery-lists', methods=['GET'])
 def search_grocery_lists():
     query = request.args.get('query')
     grocery_lists = GroceryList.query.filter(GroceryList.name.like(f"%{query}%")).all()
@@ -362,20 +382,19 @@ def bulk_remove_items():
 
 @main.route('/register', methods=['GET', 'POST'])
 def register():
-    with app.app_context():
-        if request.method == 'POST':
-            data = request.form
-            username = data.get('username', None)
-            email = data.get('email', None)
-            password = data.get('password', None)
+    if request.method == 'POST':
+        data = request.form
+        username = data.get('username', None)
+        email = data.get('email', None)
+        password = data.get('password', None)
 
-            new_user = User(username=username, email=email)
-            new_user.set_password(password)
-            db.session.add(new_user)
-            db.session.commit()
+        new_user = User(username=username, email=email)
+        new_user.set_password(password)
+        db.session.add(new_user)
+        db.session.commit()
 
-            logging.info({"msg": "User registered successfully"})
-            return render_template('dashboard.html', username=username), 200
+        logging.info({"msg": "User registered successfully"})
+        return render_template('dashboard.html', username=username), 200
 
     return render_template('register.html')
 
