@@ -7,12 +7,11 @@ from app.routes import auth_blueprint
 from app.routes import main
 from models import db
 from flask_caching import Cache
-from flask_pymongo import PyMongo
+from routes import mongo
 import logging
 import os
 
 
-mongo = PyMongo()
 migrate = Migrate()
 
 

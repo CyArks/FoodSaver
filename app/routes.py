@@ -19,7 +19,10 @@ main = Blueprint('main', __name__)
 
 # Logger setup
 logger = logging.getLogger(__name__)
-mongo = PyMongo(app, uri="mongodb://localhost:27017/foodsaver")
+
+with app.app_context():
+    mongo = PyMongo(app, uri="mongodb://localhost:27017/foodsaver")
+    
 auth_blueprint = Blueprint('auth', __name__)
 
 
