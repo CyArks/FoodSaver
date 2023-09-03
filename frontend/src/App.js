@@ -9,6 +9,10 @@ import ProfileComponent from './components/ProfileComponent';
 import GroceryListComponent from './components/GroceryListComponent';
 import MealPlanComponent from './components/MealPlanComponent';
 import SavingsFinder from './components/SavingsFinder';
+import ExpirationAlerts from './components/ExpirationAlerts';
+import SustainabilityScorePage from './components/SustainabilityScorePage';
+import PermissionsPage from './components/PermissionsPage';
+
 
 function App() {
   return (
@@ -18,6 +22,9 @@ function App() {
           {/* Add your navigation links here */}
           <Link to="/fridge">Fridge</Link>
           <Link to="/recipes">Recipes</Link>
+          <Link to="/expiration-alerts">Expiration Alerts</Link>
+          <Link to="/sustainability-score">Sustainability Score</Link>
+          <Link to="/permissions">Permissions</Link>
           {/* ... */}
         </nav>
 
@@ -65,6 +72,18 @@ function App() {
           {/* Savings Finder */}
           <Route path="/savings-finder">
             <SavingsFinder />
+          </Route>
+
+          <Route path="/expiration-alerts">
+            <ExpirationAlerts />
+          </Route>
+
+          <Route path="/sustainability-score">
+            <SustainabilityScorePage />
+          </Route>
+
+          <Route path="/permissions">
+            <PermissionsPage />
           </Route>
 
           {/* Add more routes as you implement them */}
