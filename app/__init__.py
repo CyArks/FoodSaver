@@ -7,7 +7,6 @@ from app.routes import auth_blueprint
 from app.routes import main
 from models import db
 from flask_caching import Cache
-from routes import mongo
 import logging
 import os
 
@@ -29,7 +28,6 @@ def create_app():
     cache = Cache(app)
 
     db.init_app(app)
-    mongo.init_app(app, uri="mongodb://localhost:27017/foodsaver")
     migrate.init_app(app, db)
 
     app.register_blueprint(main)

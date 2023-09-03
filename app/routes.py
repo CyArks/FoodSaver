@@ -7,9 +7,8 @@ from app.permissions import admin_permission
 from flask_login import login_required, current_user
 from app.rate_limiter import limiter
 from app.models import Recipe, db
-from flask_pymongo import PyMongo
 from app.models import User, FridgeItem, GroceryList, MealPlan, WasteTracking
-from marshmallow import Schema, fields, validate
+from marshmallow import validate
 from flask import current_app as app  # Import current_app
 from jsonschema import validate, ValidationError
 import logging
@@ -20,14 +19,9 @@ main = Blueprint('main', __name__)
 # Logger setup
 logger = logging.getLogger(__name__)
 
+
 with app.app_context():
-    mongo = PyMongo(app, uri="mongodb://localhost:27017/foodsaver")
-    
-auth_blueprint = Blueprint('auth', __name__)
-
-
-class GroceryListSchema(Schema):
-    name = fields.Str(required=True, validate=validate.length(min=1))
+    auth_blueprint = Blueprint('auth', __name__)
 
 
 @main.route('/')
@@ -306,28 +300,20 @@ def get_meal_plans():
 
 @main.route('/api/grocery_list', methods=['POST'])
 @login_required
-def create_grocery_list():
-    items = request.json['items']
-    new_list = GroceryList(user_id=current_user.id, items=items)
-    db.session.add(new_list)
-    db.session.commit()
-    logging.info({'status': 'Grocery list created'}), 201
-
-
-@app.route('/grocery-lists', methods=['GET'])
+@main.route('/grocery-lists', methods=['GET'])
 def get_grocery_lists():
     page = int(request.args.get('page', 1))
     per_page = int(request.args.get('per_page', 10))
-    offset = (page - 1) * per_page
-    grocery_lists = mongo.db.grocery_lists.find().skip(offset).limit(per_page)
-    return jsonify(list(grocery_lists))
+    pagination = GroceryList.query.paginate(page, per_page, False)
+    grocery_lists = pagination.items
+    return jsonify([grocery_list.serialize() for grocery_list in grocery_lists])
 
 
 @app.route('/search-grocery-lists', methods=['GET'])
 def search_grocery_lists():
     query = request.args.get('query')
-    grocery_lists = mongo.db.grocery_lists.find({"name": {"$regex": query}})
-    return jsonify(list(grocery_lists))
+    grocery_lists = GroceryList.query.filter(GroceryList.name.like(f"%{query}%")).all()
+    return jsonify([grocery_list.serialize() for grocery_list in grocery_lists])
 
 
 @main.route('/api/update_profile', methods=['POST'])
@@ -376,7 +362,7 @@ def bulk_remove_items():
 
 @main.route('/register', methods=['GET', 'POST'])
 def register():
-    with app.app_context():  # Explicitly specify app context
+    with app.app_context():
         if request.method == 'POST':
             data = request.form
             username = data.get('username', None)
