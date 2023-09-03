@@ -60,10 +60,6 @@ def login():
     return render_template('login.html')
 
 
-    # Handle GET request
-    return render_template('login.html')
-
-
 @main.route('/api/fetch_deals', methods=['GET'])
 def fetch_deals():
     # For demonstration purposes, we'll assume "Too Good To Go" has an endpoint like this:
@@ -189,6 +185,7 @@ def admin_route():
     logging.info({'message': 'This is an admin route'})
 
 
+# ToDo: Look at the following route and add / improve code: Add models.py/User/set_Password
 @main.route('/change_password', methods=['POST'])
 @jwt_required()
 def change_password():
@@ -253,8 +250,6 @@ def search_recipes():
     sort_by_rating = request.args.get('sort_by_rating')
     if sort_by_rating:
         query = query.order_by(Recipe.rating.desc())
-
-    # Add more filters as neded
 
     recipes = query.all()
     logging.info([recipe.serialize() for recipe in recipes])
@@ -360,7 +355,8 @@ def register():
 
         # Add your actual user registration logic here
         # For example, you might want to add the new user to your database
-        new_user = User(username=username, email=email, password=password)
+        new_user = User(username=username, email=email)
+        new_user.set_password(password)
         db.session.add(new_user)
         db.session.commit()
 

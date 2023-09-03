@@ -40,6 +40,8 @@ class User(db.Model):
 
 
 class FridgeItem(db.Model):
+    __tablename__ = 'Products'
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     expiration_date = db.Column(db.Date, nullable=False)
@@ -50,12 +52,15 @@ class FridgeItem(db.Model):
 
 
 class DietaryPreferences(db.Model):
+    __tablename__ = 'dietary_preferences'
+
     id = db.Column(db.Integer, primary_key=True)
     preference = db.Column(db.String(64), index=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
 
 class Recipes(db.Model):
+    __tablename__ = 'recipes'
     id = db.Column(db.Integer, primary_key=True)
     recipe_name = db.Column(db.String(128), index=True)
     ingredients = db.Column(db.String(256))
@@ -80,11 +85,10 @@ class WasteTracking(db.Model):
     __tablename__ = 'waste_tracking'
     
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    food_item_id = db.Column(db.Integer, db.ForeignKey('FridgeItem.id'), nullable=False)
     action = db.Column(db.String(50), nullable=False)  # Used, Expired, or Thrown
     date = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-
+    food_item_id = db.Column(db.Integer, db.ForeignKey('fridgeitem.id'), nullable=False)
     user = db.relationship("User", back_populates="waste_actions")
 
 

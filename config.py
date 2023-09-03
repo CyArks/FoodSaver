@@ -10,9 +10,9 @@ class Config:
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    # Add any development-specific configurations here
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///app.db'
 
 
 class ProductionConfig(Config):
     DEBUG = False
-    # Add any production-specific configurations here
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///app.db'

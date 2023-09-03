@@ -1,4 +1,5 @@
 from flask_jwt_extended import JWTManager
+from flask_migrate import Migrate
 from config import DevelopmentConfig, ProductionConfig
 from logging.handlers import RotatingFileHandler
 from flask import Flask, jsonify
@@ -8,22 +9,27 @@ import logging
 import os
 
 
+migrate = Migrate()
+
+
 def create_app():
     app = Flask(__name__)
     app.config['JWT_SECRET_KEY'] = 'your-secret-key'
     app.config['JWT_TOKEN_LOCATION'] = ['headers']
-
-    jwt = JWTManager(app)
 
     if os.environ.get("FLASK_ENV") == "production":
         app.config.from_object(ProductionConfig)
     else:
         app.config.from_object(DevelopmentConfig)
 
+    jwt = JWTManager(app)
+
+    db.init_app(app)
+    migrate.init_app(app, db)
+
     app.register_blueprint(main)
 
     # Initialize other extensions'
-    db.init_app(app)
     with app.app_context():
         db.create_all()
 
