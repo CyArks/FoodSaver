@@ -16,6 +16,7 @@ main = Blueprint('main', __name__)
 
 # Logger setup
 logger = logging.getLogger(__name__)
+auth_blueprint = Blueprint('auth', __name__)
 
 
 @main.route('/')
@@ -51,13 +52,13 @@ def login():
             # Set cookie with the access_token
             resp.set_cookie('access_token', access_token)
 
-            return resp, 200
+            return jsonify({'msg': 'Login successful'}), 200
 
-        logging.info({"msg": "Invalid username or password"})
-        return render_template('login.html', error="Invalid username or password"), 401
+        return jsonify({'error': 'Invalid username or password'}), 401
 
     # Handle GET request
-    return render_template('login.html')
+    if request.method == 'GET':
+        return render_template('login.html')
 
 
 @main.route('/api/fetch_deals', methods=['GET'])

@@ -3,6 +3,7 @@ from flask_migrate import Migrate
 from config import DevelopmentConfig, ProductionConfig
 from logging.handlers import RotatingFileHandler
 from flask import Flask, jsonify
+from app.routes import auth_blueprint
 from app.routes import main
 from models import db
 import logging
@@ -27,7 +28,7 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
 
-    app.register_blueprint(main)
+    app.register_blueprint(auth_blueprint, url_prefix='/auth')  # Register the auth_blueprint
 
     # Initialize other extensions'
     with app.app_context():
