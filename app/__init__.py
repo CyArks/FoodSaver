@@ -5,19 +5,19 @@ from logging.handlers import RotatingFileHandler
 from flask import Flask, jsonify
 from app.routes import auth_blueprint
 from app.routes import main
-from models import db
+from models import db, User
 from flask_caching import Cache
 import logging
 import os
 
 
+# Initialize extensions
+jwt = JWTManager()
+cache = Cache()
 migrate = Migrate()
 
 
 def create_app():
-    import pdb
-    pdb.set_trace()
-
     app = Flask(__name__)
     app.config['JWT_SECRET_KEY'] = 'your-secret-key'
     app.config['JWT_TOKEN_LOCATION'] = ['headers']
@@ -26,9 +26,8 @@ def create_app():
         app.config.from_object(ProductionConfig)
     else:
         app.config.from_object(DevelopmentConfig)
-
-    jwt = JWTManager(app)
-    cache = Cache(app)
+        # import pdb
+        # pdb.set_trace()
 
     jwt.init_app(app)
     cache.init_app(app)
@@ -50,17 +49,24 @@ def create_app():
     app.logger.addHandler(handler)
 
     # Error Handling
+    @app.errorhandler(403)
+    def forbidden_error(error):
+        logging.error(error)
+        return jsonify({"error": "Forbidden"}), 403
+
     @app.errorhandler(404)
     def not_found_error(error):
-        return jsonify({f"{error}": "Not Found"}), 404
+        logging.error(error)
+        return jsonify({"error": "Not Found"}), 404
 
     @app.errorhandler(500)
     def internal_error(error):
-        return jsonify({f"{error}": "Internal Server Error"}), 500
+        logging.error(error)
+        return jsonify({f"error": "Internal Server Error"}), 500
 
     return app
 
 
 if __name__ == '__main__':
-    app = create_app()
-    app.run(host='0.0.0.0', port=5001, debug=True)
+    application = create_app()
+    application.run(host='0.0.0.0', port=5001, debug=True)

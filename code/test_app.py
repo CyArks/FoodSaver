@@ -1,6 +1,7 @@
 import unittest
 from app import create_app, db
 
+
 class TestApp(unittest.TestCase):
     
     def setUp(self):

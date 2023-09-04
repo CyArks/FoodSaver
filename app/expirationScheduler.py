@@ -1,5 +1,5 @@
 from apscheduler.schedulers.background import BackgroundScheduler
-from models import db, FridgeItem, User, Notifications
+from models import db, Product, User, Notifications
 from datetime import datetime, timedelta
 from mail_functions import send_mail
 import logging
@@ -12,7 +12,7 @@ def check_expirations():
     try:
         # Logic to find expired items
         now = datetime.utcnow()
-        soon_to_expire = FridgeItem.query.filter(FridgeItem.expiration_date <= (now + timedelta(days=3))).all()
+        soon_to_expire = Product.query.filter(Product.expiration_date <= (now + timedelta(days=3))).all()
 
         for item in soon_to_expire:
             owner = User.query.filter_by(id=item.user_id).first()

@@ -1,16 +1,17 @@
 import os
-import requests
-from flask import Blueprint, jsonify, request, render_template, make_response
-from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token
-from app.cache_manager import get_offer, invalidate_offer_cache
-from app.permissions import admin_permission
-from flask_login import login_required, current_user
-from app.rate_limiter import limiter
-from app.models import Recipe, db
-from app.models import User, FridgeItem, GroceryList, MealPlan, WasteTracking
-from marshmallow import validate
-from jsonschema import validate, ValidationError
 import logging
+import requests
+from functools import wraps
+from marshmallow import validate
+from app.models import Recipe, db
+from app.rate_limiter import limiter
+from app.permissions import admin_permission
+from jsonschema import validate, ValidationError
+from flask_login import login_required, current_user
+from app.cache_manager import get_offer, invalidate_offer_cache
+from app.models import User, Product, GroceryList, MealPlan, WasteTracking
+from flask import Blueprint, jsonify, request, render_template, make_response, current_app
+from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token, decode_token
 
 # Create Blueprint
 main = Blueprint('main', __name__)
@@ -18,6 +19,27 @@ auth_blueprint = Blueprint('auth', __name__)
 
 # Logger setup
 logger = logging.getLogger(__name__)
+
+
+def token_required(f):
+    @wraps(f)
+    def decorator(*args, **kwargs):
+        token = None
+        if 'x-access-tokens' in request.headers:
+            token = request.headers['x-access-tokens']
+
+        if not token:
+            return jsonify({'message': 'a valid token is missing'})
+
+        try:
+            data = decode_token(token)
+            current_user = User.query.filter_by(id=data['id']).first()
+        except:
+            return jsonify({'message': 'token is invalid'})
+
+        return f(current_user, *args, **kwargs)
+
+    return decorator
 
 
 @main.route('/')
@@ -35,6 +57,9 @@ def debug_route():
 
 @main.route('/login', methods=['GET', 'POST'])
 def login():
+    db = current_app.extensions['sqlalchemy'].db
+    print(f"SQLAlchemy db instance: {db}")
+
     if request.method == 'POST':
         # Handle login
         username = request.form['username']
@@ -92,6 +117,7 @@ waste_schema = {
 @main.route('/api/track_waste', methods=['POST'])
 @login_required
 def track_waste():
+    db = current_app.extensions['sqlalchemy'].db
     data = request.json
     logging.info(f"Received waste tracking data: {data}")
 
@@ -130,6 +156,7 @@ def track_waste():
 @main.route('/api/recipes', methods=['POST'])
 @login_required
 def create_recipe():
+    db = current_app.extensions['sqlalchemy'].db
     data = request.json
     new_recipe = Recipe(
         name=data['name'],
@@ -175,9 +202,10 @@ def secure_route():
 
 
 @main.route('/admin', methods=['GET'])
-@jwt_required()
+@token_required
 def admin_route():
     current_user_id = get_jwt_identity()
+    print(current_user_id)
     user = User.find_by_id(current_user_id)
 
     if not user.has_role('admin'):
@@ -234,6 +262,7 @@ def show_offer(offer_id):
 
 @main.route('/api/search_recipes', methods=['GET'])
 def search_recipes():
+    db = current_app.extensions['sqlalchemy'].db
     query = db.session.query(Recipe)
 
     # Filtering by dietary restrictions
@@ -275,6 +304,7 @@ def update_offer(offer_id):
 @main.route('/api/meal_plan', methods=['POST'])
 @login_required
 def create_meal_plan():
+    db = current_app.extensions['sqlalchemy'].db
     recipe_ids = request.json['recipe_ids']
     new_plan = MealPlan(user_id=current_user.id, recipe_ids=recipe_ids)
     db.session.add(new_plan)
@@ -297,6 +327,7 @@ def get_meal_plans():
 @main.route('/grocery-lists', methods=['GET', 'POST'])
 @login_required
 def handle_grocery_lists():
+    db = current_app.extensions['sqlalchemy'].db
     if request.method == 'POST':
         data = request.json
         name = data.get('name')
@@ -339,6 +370,7 @@ def search_grocery_lists():
 @main.route('/api/update_profile', methods=['POST'])
 @login_required
 def update_profile():
+    db = current_app.extensions['sqlalchemy'].db
     data = request.json
     current_user.username = data.get('username', current_user.username)
     current_user.email = data.get('email', current_user.email)
@@ -357,7 +389,7 @@ def bulk_add_items():
 
     for item in items:
         # Validate item fields here
-        new_item = FridgeItem(
+        new_item = Product(
             name=item['name'],
             expiration_date=item['expiration_date'],
             weight=item.get('weight', None),
@@ -373,8 +405,9 @@ def bulk_add_items():
 @main.route('/api/fridge/bulk_remove', methods=['POST'])
 @login_required
 def bulk_remove_items():
+    db = current_app.extensions['sqlalchemy'].db
     item_ids = request.json['item_ids']
-    FridgeItem.query.filter(FridgeItem.id.in_(item_ids)).delete(synchronize_session='fetch')
+    Product.query.filter(Product.id.in_(item_ids)).delete(synchronize_session='fetch')
     db.session.commit()
     logging.info({'status': 'Items removed'}), 200
     return render_template('login.html')
@@ -382,6 +415,7 @@ def bulk_remove_items():
 
 @main.route('/register', methods=['GET', 'POST'])
 def register():
+    db = current_app.extensions['sqlalchemy'].db
     if request.method == 'POST':
         data = request.form
         username = data.get('username', None)
