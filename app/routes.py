@@ -7,15 +7,24 @@ from app.models import Recipe, db
 from app.rate_limiter import limiter
 from app.permissions import admin_permission
 from jsonschema import validate, ValidationError
-from flask_login import login_required, current_user
+from flask_login import login_required, current_user, logout_user
 from app.cache_manager import get_offer, invalidate_offer_cache
 from app.models import User, Product, GroceryList, MealPlan, WasteTracking
-from flask import Blueprint, jsonify, request, render_template, make_response, current_app
+from flask import Blueprint, jsonify, request, render_template, make_response, current_app, redirect, url_for
 from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token, decode_token
 
-# Create Blueprint
+# Create Blueprints
 main = Blueprint('main', __name__)
 auth_blueprint = Blueprint('auth', __name__)
+deals_blueprint = Blueprint('deals', __name__)
+waste_tracking_blueprint = Blueprint('waste_tracking', __name__)
+recipes_blueprint = Blueprint('recipes', __name__)
+meal_plans_blueprint = Blueprint('meal_plans', __name__)
+grocery_lists_blueprint = Blueprint('grocery_lists', __name__)
+fridge_blueprint = Blueprint('fridge', __name__)
+profile_blueprint = Blueprint('profile', __name__)
+registration_blueprint = Blueprint('registration', __name__)
+error_handling_blueprint = Blueprint('error_handling', __name__)
 
 # Logger setup
 logger = logging.getLogger(__name__)
@@ -87,6 +96,13 @@ def login():
         return render_template('login.html')
 
 
+@main.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
+
 @main.route('/api/fetch_deals', methods=['GET'])
 def fetch_deals():
     # For demonstration purposes, we'll assume "Too Good To Go" has an endpoint like this:
@@ -153,7 +169,7 @@ def track_waste():
     logging.info({'status': 'Waste tracked', 'new_score': new_score}), 201
 
 
-@main.route('/api/recipes', methods=['POST'])
+@main.route('/api/create_recipe', methods=['POST'])
 @login_required
 def create_recipe():
     db = current_app.extensions['sqlalchemy'].db
@@ -242,18 +258,6 @@ def change_password():
         return jsonify({'message': 'Could not change password'}), 500
 
 
-@main.route('/admin')
-@admin_permission.require(http_exception=403)
-def admin():
-    return 'Admin page'
-
-
-@main.route('/some_path')
-@limiter.limit("5 per minute")  # Override the default rate limit for this route
-def some_route():
-    return 'This is some route.'
-
-
 @main.route('/offer/<int:offer_id>')
 def show_offer(offer_id):
     offer = get_offer(offer_id)
@@ -301,7 +305,7 @@ def update_offer(offer_id):
     logging.info({"status": "Offer updated and cache invalidated."})
 
 
-@main.route('/api/meal_plan', methods=['POST'])
+@main.route('/api/create_meal_plan', methods=['POST'])
 @login_required
 def create_meal_plan():
     db = current_app.extensions['sqlalchemy'].db
@@ -321,7 +325,11 @@ def create_meal_plan():
 @login_required
 def get_meal_plans():
     plans = MealPlan.query.filter_by(user_id=current_user.id).all()
-    logging.info([plan.serialize() for plan in plans]), 200
+    logging.info([plan.serialize() for plan in plans])
+
+    resp = make_response(render_template('meal_plans.html'))
+
+    return resp, 200
 
 
 @main.route('/grocery-lists', methods=['GET', 'POST'])
@@ -431,6 +439,39 @@ def register():
         return render_template('dashboard.html', username=username), 200
 
     return render_template('register.html')
+
+
+@main.route('/profile', methods=['GET'])
+@login_required
+def view_profile():
+    try:
+        print('Inside view_profile function')
+        user_id = current_user.id  # Get the current user's ID
+        print(f'User ID: {user_id}')
+
+        user = User.query.get(user_id)  # Fetch the user's data from the database
+        print(f'User object: {user}')
+
+        if user is None:
+            print('User not found, returning 404')
+            return jsonify({'error': 'User not found'}), 404
+
+        print('Rendering profile template')
+        return render_template('profile.html', user=user)  # Explicitly return the response
+    except Exception as e:
+        print(f'An exception occurred: {e}')
+        return jsonify({'error': 'An internal error occurred'}), 500
+
+
+@login_required
+def view_profile():
+    user_id = current_user.id  # Get the current user's ID
+    user = User.query.get(user_id)  # Fetch the user's data from the database
+
+    if user is None:
+        return jsonify({'error': 'User not found'}), 404
+
+    return render_template('profile.html', user=user)  # Explicitly return the response
 
 
 @main.errorhandler(400)

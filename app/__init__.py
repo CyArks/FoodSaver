@@ -1,9 +1,12 @@
 from flask_jwt_extended import JWTManager
+from flask_login import LoginManager
 from flask_migrate import Migrate
 from config import DevelopmentConfig, ProductionConfig
 from logging.handlers import RotatingFileHandler
 from flask import Flask, jsonify
-from app.routes import auth_blueprint
+from app.routes import auth_blueprint, deals_blueprint, recipes_blueprint, grocery_lists_blueprint, \
+    waste_tracking_blueprint, meal_plans_blueprint, profile_blueprint, fridge_blueprint, registration_blueprint, \
+    error_handling_blueprint
 from app.routes import main
 from models import db, User
 from flask_caching import Cache
@@ -15,6 +18,7 @@ import os
 jwt = JWTManager()
 cache = Cache()
 migrate = Migrate()
+login_manager = LoginManager()
 
 
 def create_app():
@@ -32,10 +36,21 @@ def create_app():
     jwt.init_app(app)
     cache.init_app(app)
     db.init_app(app)
+    login_manager.init_app(app)
     migrate.init_app(app, db)
 
+    # Register blueprints
     app.register_blueprint(main)
-    app.register_blueprint(auth_blueprint, url_prefix='/auth')  # Register the auth_blueprint
+    app.register_blueprint(auth_blueprint, url_prefix='/auth')
+    app.register_blueprint(deals_blueprint)
+    app.register_blueprint(waste_tracking_blueprint)
+    app.register_blueprint(recipes_blueprint)
+    app.register_blueprint(meal_plans_blueprint)
+    app.register_blueprint(grocery_lists_blueprint)
+    app.register_blueprint(fridge_blueprint)
+    app.register_blueprint(profile_blueprint)
+    app.register_blueprint(registration_blueprint)
+    app.register_blueprint(error_handling_blueprint)
 
     # Initialize other extensions'
     with app.app_context():
@@ -47,6 +62,11 @@ def create_app():
     formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
     handler.setFormatter(formatter)
     app.logger.addHandler(handler)
+
+    # User loader function
+    @login_manager.user_loader
+    def load_user(user_id):
+        return User.query.get(int(user_id))
 
     # Error Handling
     @app.errorhandler(403)

@@ -30,14 +30,25 @@
             text-align: center;
             background-color: #333;
         }
-        nav a {
+        nav a, .dropdown-button {
             padding: 14px 20px;
             display: inline-block;
             color: white;
             text-decoration: none;
         }
-        nav a:hover {
+        nav a:hover, .dropdown-content a:hover {
             background-color: #555;
+        }
+        /* Dropdown Styles */
+        .dropdown {
+            display: inline-block;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #333;
+            min-width: 160px;
+            z-index: 1;
         }
         /* Main Content Styles */
         main {
@@ -45,6 +56,12 @@
             min-height: calc(100vh - 2em - 1em);  /* Adjust based on header and footer height */
         }
     </style>
+    <script>
+        function toggleDropdown() {
+            const dropdownContent = document.getElementById("dropdown-content");
+            dropdownContent.style.display = dropdownContent.style.display === "block" ? "none" : "block";
+        }
+    </script>
 </head>
 <body>
     <!-- Header -->
@@ -57,7 +74,15 @@
         <a href="/">Home</a>
         <a href="/login">Login</a>
         <a href="/register">Register</a>
-        <!-- Add more links based on your routes -->
+        <a href="/profile">Profile</a>
+        <a href="/meal_plans">Meal Plans</a>
+        <div class="dropdown">
+            <button onclick="toggleDropdown()" class="dropdown-button">Settings</button>
+            <div id="dropdown-content" class="dropdown-content">
+                <a href="/settings">Account Settings</a>
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
     </nav>
 
     <!-- Main Content -->
