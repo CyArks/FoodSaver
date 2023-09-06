@@ -4,12 +4,13 @@ from flask_migrate import Migrate
 from config import DevelopmentConfig, ProductionConfig
 from logging.handlers import RotatingFileHandler
 from flask import Flask, jsonify
-from app.routes import auth_blueprint, deals_blueprint, recipes_blueprint, grocery_lists_blueprint, \
-    waste_tracking_blueprint, meal_plans_blueprint, profile_blueprint, fridge_blueprint, registration_blueprint, \
-    error_handling_blueprint
-from app.routes import main
-from models import db, User
+from app.routes import recipes_routes, main_routes, auth_routes, user_routes, user_product_routes, \
+    error_handling_routes, external_deals_routes, grocery_list_routes, meal_planer_routes, settings_routes, \
+    waste_tracking_routes
+from app.routes.main_routes import main
+from app.Models.UserModel import User
 from flask_caching import Cache
+from Models.init_alchemy_database import db
 import logging
 import os
 
@@ -41,16 +42,15 @@ def create_app():
 
     # Register blueprints
     app.register_blueprint(main)
-    app.register_blueprint(auth_blueprint, url_prefix='/auth')
-    app.register_blueprint(deals_blueprint)
-    app.register_blueprint(waste_tracking_blueprint)
-    app.register_blueprint(recipes_blueprint)
-    app.register_blueprint(meal_plans_blueprint)
-    app.register_blueprint(grocery_lists_blueprint)
-    app.register_blueprint(fridge_blueprint)
-    app.register_blueprint(profile_blueprint)
-    app.register_blueprint(registration_blueprint)
-    app.register_blueprint(error_handling_blueprint)
+    app.register_blueprint(auth_routes.auth_blueprint, url_prefix='/auth')
+    app.register_blueprint(external_deals_routes.deals_blueprint, url_prefix='/deals')
+    app.register_blueprint(waste_tracking_routes.waste_tracking_blueprint)
+    app.register_blueprint(recipes_routes.recipes_blueprint)
+    app.register_blueprint(meal_planer_routes.meal_plans_blueprint)
+    app.register_blueprint(grocery_list_routes.grocery_lists_blueprint)
+    app.register_blueprint(user_product_routes.stored_products_blueprint)
+    app.register_blueprint(user_routes.profile_blueprint)
+    app.register_blueprint(error_handling_routes.error_handling_blueprint)
 
     # Initialize other extensions'
     with app.app_context():

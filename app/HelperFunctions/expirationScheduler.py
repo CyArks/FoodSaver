@@ -1,5 +1,5 @@
 from apscheduler.schedulers.background import BackgroundScheduler
-from models import db, Product, User, Notifications
+from app.Models.models import db, Product, User, Notifications
 from datetime import datetime, timedelta
 from mail_functions import send_mail
 import logging
