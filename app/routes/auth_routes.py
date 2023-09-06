@@ -1,5 +1,7 @@
+import logging
+
 from flask_jwt_extended import create_access_token
-from flask_login import login_required, logout_user, current_user
+from flask_login import login_required, logout_user
 from flask import Blueprint, jsonify, make_response, render_template, current_app, request, redirect, url_for
 from app.Models.UserModel import User
 
@@ -45,8 +47,7 @@ def logout():
     return redirect(url_for('index'))
 
 
-
-@main.route('/register', methods=['GET', 'POST'])
+@auth_blueprint.route('/register', methods=['GET', 'POST'])
 def register():
     db = current_app.extensions['sqlalchemy'].db
     if request.method == 'POST':

@@ -1,5 +1,5 @@
-from init_alchemy_database import db
-from ProductModel import grocerylist_product_association
+from app.Models.init_alchemy_database import db
+from app.Models.ProductModel import grocerylist_product_association
 
 
 class GroceryList(db.Model):

@@ -10,7 +10,7 @@ from app.routes import recipes_routes, main_routes, auth_routes, user_routes, us
 from app.routes.main_routes import main
 from app.Models.UserModel import User
 from flask_caching import Cache
-from Models.init_alchemy_database import db
+from app.Models.init_alchemy_database import db
 import logging
 import os
 
@@ -40,17 +40,17 @@ def create_app():
     login_manager.init_app(app)
     migrate.init_app(app, db)
 
-    # Register blueprints
-    app.register_blueprint(main)
+    # Register blueprints with url_prefix
+    app.register_blueprint(main, url_prefix='/')
     app.register_blueprint(auth_routes.auth_blueprint, url_prefix='/auth')
     app.register_blueprint(external_deals_routes.deals_blueprint, url_prefix='/deals')
-    app.register_blueprint(waste_tracking_routes.waste_tracking_blueprint)
-    app.register_blueprint(recipes_routes.recipes_blueprint)
-    app.register_blueprint(meal_planer_routes.meal_plans_blueprint)
-    app.register_blueprint(grocery_list_routes.grocery_lists_blueprint)
-    app.register_blueprint(user_product_routes.stored_products_blueprint)
-    app.register_blueprint(user_routes.profile_blueprint)
-    app.register_blueprint(error_handling_routes.error_handling_blueprint)
+    app.register_blueprint(waste_tracking_routes.waste_tracking_blueprint, url_prefix='/waste-tracking')
+    app.register_blueprint(recipes_routes.recipes_blueprint, url_prefix='/recipes')
+    app.register_blueprint(meal_planer_routes.meal_plans_blueprint, url_prefix='/meal-plans')
+    app.register_blueprint(grocery_list_routes.grocery_lists_blueprint, url_prefix='/grocery-lists')
+    app.register_blueprint(user_product_routes.stored_products_blueprint, url_prefix='/stored-products')
+    app.register_blueprint(user_routes.profile_blueprint, url_prefix='/profile')
+    app.register_blueprint(error_handling_routes.error_handling_blueprint, url_prefix='/error-handling')
 
     # Initialize other extensions'
     with app.app_context():

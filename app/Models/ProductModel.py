@@ -1,5 +1,5 @@
-from init_alchemy_database import db
-from RecipeModel import recipe_product_association
+from app.Models.init_alchemy_database import db
+from app.Models.RecipeModel import recipe_product_association
 
 # Association table for GroceryList and Product
 grocerylist_product_association \

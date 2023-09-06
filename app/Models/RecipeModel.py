@@ -1,5 +1,5 @@
 from datetime import datetime
-from init_alchemy_database import db
+from app.Models.init_alchemy_database import db
 
 # Association table for Recipe and Product (Ingredients)
 recipe_product_association \
