@@ -23,3 +23,13 @@ form {
 label, input {
     margin-bottom: 10px;
 }
+
+.settings-container {
+  margin: 20px;
+  padding: 20px;
+  border: 1px solid #ccc;
+}
+
+.settings-message {
+  margin-top: 20px;
+}

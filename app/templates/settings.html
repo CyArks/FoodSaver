@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Settings</title>
+  <link rel="stylesheet" href="/static/css/styles.css"> <!-- Optional: Link to your CSS file -->
+</head>
+<body>
+  <div id="root">
+    <!-- React will render the Settings component here -->
+  </div>
+
+  <!-- Include React and ReactDOM libraries -->
+  <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+
+  <!-- Include Babel for JSX compilation -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Include your React component -->
+  <script type="text/babel" src="/static/js/Settings.js"></script>
+  <script type="text/babel" src="/static/js/SettingsPage.js"></script>
+
+  <script type="text/babel">
+    // Render the SettingsPage component
+    ReactDOM.render(
+      <SettingsPage />,
+      document.getElementById('root')
+    );
+  </script>
+</body>
+</html>

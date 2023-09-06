@@ -51,6 +51,7 @@ def create_app():
     app.register_blueprint(user_product_routes.stored_products_blueprint, url_prefix='/stored-products')
     app.register_blueprint(user_routes.profile_blueprint, url_prefix='/profile')
     app.register_blueprint(error_handling_routes.error_handling_blueprint, url_prefix='/error-handling')
+    app.register_blueprint(settings_routes.settings_blueprint, url_prefix='/settings')
 
     # Initialize other extensions'
     with app.app_context():

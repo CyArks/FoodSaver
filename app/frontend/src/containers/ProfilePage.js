@@ -11,7 +11,7 @@ const ProfileComponent = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('/api/profile', {
+        const response = await axios.get('/profile/', {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
           },
@@ -33,7 +33,7 @@ const ProfileComponent = () => {
 
   const updateProfile = async () => {
     try {
-      await axios.put('/api/profile', {
+      await axios.put('/profile/api/update_profile', {
         username,
         email,
         dietary_preferences: dietaryPreferences,

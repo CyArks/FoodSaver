@@ -15,7 +15,7 @@
         const password = document.getElementById('password').value;
 
         try {
-            const response = await fetch('/login', {
+            const response = await fetch('/auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -68,8 +68,8 @@
 
     <h2>Login</h2>
     <div class="login-container">
-        <form action="/login" method="post">
-            <form action="/login" method="post">
+        <form action="/auth/login" method="post">
+            <form action="/auth/login" method="post">
                 <label for="username">Username:</label>
                 <input type="text" id="username" name="username" required><br>
                 <label for="password">Password:</label>

@@ -1,11 +1,17 @@
 import logging
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_login import login_required, current_user
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify, current_app, render_template
 
 from app.Models.UserModel import User
 
 settings_blueprint = Blueprint('settings', __name__)
+
+
+@settings_blueprint.route('/', methods=['POST'])
+@jwt_required()
+def render_settings():
+    return render_template('settings.html')
 
 
 @settings_blueprint.route('/change_password', methods=['POST'])
@@ -35,14 +41,3 @@ def change_password():
         return jsonify({'message': 'Could not change password'}), 500
 
 
-@settings_blueprint.route('/api/update_profile', methods=['POST'])
-@login_required
-def update_profile():
-    db = current_app.extensions['sqlalchemy'].db
-    data = request.json
-    current_user.username = data.get('username', current_user.username)
-    current_user.email = data.get('email', current_user.email)
-    current_user.dietary_preferences = data.get('dietary_preferences', current_user.dietary_preferences)
-    current_user.notification_preferences = data.get('notification_preferences', current_user.notification_preferences)
-    db.session.commit()
-    logging.info({'status': 'Profile updated'}), 200

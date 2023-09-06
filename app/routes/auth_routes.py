@@ -31,7 +31,7 @@ def login():
             # Set cookie with the access_token
             resp.set_cookie('access_token', access_token)
 
-            return jsonify({'msg': 'Login successful'}), 200
+            return redirect(url_for('profile.view_profile'))
 
         return jsonify({'error': 'Invalid username or password'}), 401
 
