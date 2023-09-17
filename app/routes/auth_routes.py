@@ -50,11 +50,18 @@ def logout():
 @auth_blueprint.route('/register', methods=['GET', 'POST'])
 def register():
     db = current_app.extensions['sqlalchemy'].db
+
     if request.method == 'POST':
         data = request.form
-        username = data.get('username', None)
         email = data.get('email', None)
+        username = data.get('username', None)
         password = data.get('password', None)
+
+        if User.email_already_exists(email):
+            return jsonify({'error': 'Email already in use!'}), 000
+
+        if not User.username_is_unique(username):
+            return jsonify({'error': 'Username already in use!'}), 000
 
         new_user = User(username=username, email=email)
         new_user.set_password(password)

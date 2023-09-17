@@ -9,7 +9,6 @@ settings_blueprint = Blueprint('settings', __name__)
 
 
 @settings_blueprint.route('/', methods=['POST'])
-@jwt_required()
 def render_settings():
     return render_template('settings.html')
 

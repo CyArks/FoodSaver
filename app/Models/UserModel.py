@@ -35,6 +35,16 @@ class User(db.Model):
     def find_by_id(cls, user_id):
         return cls.query.filter_by(id=user_id).first()
 
+    @classmethod
+    def email_already_exists(cls, email):
+        existing_user = cls.query.filter_by(email=email).first()
+        return existing_user is not None
+
+    @classmethod
+    def username_is_unique(cls, username):
+        existing_user = cls.query.filter_by(username=username).first()
+        return existing_user is None
+
 
 class DietaryPreference(db.Model):
     __tablename__ = 'DietaryPreference'
