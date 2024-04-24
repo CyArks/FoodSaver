@@ -33,6 +33,7 @@ def login():
 
             return redirect(url_for('profile.view_profile'))
 
+        # ToDo: Use Java script to handle this error
         return jsonify({'error': 'Invalid username or password'}), 401
 
     # Handle GET request
@@ -58,10 +59,12 @@ def register():
         password = data.get('password', None)
 
         if User.email_already_exists(email):
-            return jsonify({'error': 'Email already in use!'}), 000
+            # ToDo: Trigger javascript code to display that the email is already in use
+            return jsonify({'error': 'Email already in use!'}), 000  # ToDo: update return code
 
         if not User.username_is_unique(username):
-            return jsonify({'error': 'Username already in use!'}), 000
+            # ToDo: Trigger javascript code to display that the username is already in use
+            return jsonify({'error': 'Username already in use!'}), 000  # ToDo: update return code
 
         new_user = User(username=username, email=email)
         new_user.set_password(password)

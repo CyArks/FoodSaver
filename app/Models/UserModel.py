@@ -1,5 +1,7 @@
 import logging
 from datetime import datetime
+from typing import re
+
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.Models.init_alchemy_database import db
 

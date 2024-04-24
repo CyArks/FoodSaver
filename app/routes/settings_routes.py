@@ -1,9 +1,9 @@
 import logging
-from flask_jwt_extended import get_jwt_identity, jwt_required
-from flask_login import login_required, current_user
-from flask import Blueprint, request, jsonify, current_app, render_template
 
 from app.Models.UserModel import User
+
+from flask_jwt_extended import get_jwt_identity, jwt_required
+from flask import Blueprint, request, jsonify, render_template
 
 settings_blueprint = Blueprint('settings', __name__)
 
@@ -38,5 +38,3 @@ def change_password():
     else:
         logging.error(f'Failed to change password for user: {current_user_id}')
         return jsonify({'message': 'Could not change password'}), 500
-
-

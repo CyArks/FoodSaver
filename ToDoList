@@ -1,0 +1,16 @@
+
+Development-Tasks:
+-- Add videostream handler
+-- Implement Backend routes for possibleMeals
+-- Implement all frontend pages with the functionality already in Backend
+-- Write migration script
+-- Handle errors -> Print message on site
+
+Testing-Tasks:
+-- Test Frontend functionality
+-- Write Unit tests for Backend
+
+Deployment-Tasks:
+-- Scalability?
+-- Select a Service for deployment
+-- Deploy Application
