@@ -1,0 +1,82 @@
+{% extends "layout.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+
+<script>
+    const form = document.getElementById('login-form');
+    const errorMessage = document.getElementById('error-message');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        try {
+            const response = await fetch('/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password }),
+            });
+
+            if (!response.ok) {
+                const data = await response.json();
+                errorMessage.textContent = data.error;
+            } else {
+                // Clear error message and redirect to dashboard or another page
+                errorMessage.textContent = '';
+                window.location.href = '/dashboard'; // Redirect to the dashboard page
+            }
+        } catch (error) {
+            console.error('An error occurred:', error);
+        }
+    });
+</script>
+
+
+    <style>
+        /* Local Styles for Login Page */
+        .login-container {
+            max-width: 400px;
+            margin: auto;
+            background-color: #333;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        label, input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+    </style>
+
+    <h2>Login</h2>
+    <div class="login-container">
+        <form action="/auth/login" method="post">
+            <form action="/auth/login" method="post">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required><br>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required><br>
+                <input type="submit" value="Login">
+            </form>
+
+        </form>
+    </div>
+{% endblock %}

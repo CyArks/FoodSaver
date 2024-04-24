@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block title %}Recipes{% endblock %}
+
+{% block content %}
+    <style>
+        /* Local Styles for Recipes Page */
+        .recipe-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+        .recipe-card {
+            max-width: 300px;
+            background-color: #333;
+            margin: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .recipe-title {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+        .recipe-description {
+            font-size: 1em;
+            margin-bottom: 10px;
+        }
+        .recipe-link {
+            text-align: right;
+        }
+    </style>
+
+    <h2>Recipes</h2>
+    <div class="recipe-container">
+        <!-- Sample Recipe Card -->
+        <div class="recipe-card">
+            <div class="recipe-title">Sample Recipe</div>
+            <div class="recipe-description">This is a sample recipe description.</div>
+            <div class="recipe-link"><a href="#">Read More</a></div>
+        </div>
+        <!-- Add more recipe cards here -->
+    </div>
+{% endblock %}

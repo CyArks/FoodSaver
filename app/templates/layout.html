@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}FoodSaver{% endblock %}</title>
+    <style>
+        /* Global Styles */
+        body {
+            background-color: #2c2c2c;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #1a1a1a;
+            padding: 1em;
+            text-align: center;
+        }
+        footer {
+            background-color: #1a1a1a;
+            padding: 1em;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+        /* Navigation Styles */
+        nav {
+            text-align: center;
+            background-color: #333;
+        }
+        nav a, .dropdown-button {
+            padding: 14px 20px;
+            display: inline-block;
+            color: white;
+            text-decoration: none;
+        }
+        nav a:hover, .dropdown-content a:hover {
+            background-color: #555;
+        }
+        /* Dropdown Styles */
+        .dropdown {
+            display: inline-block;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #333;
+            min-width: 160px;
+            z-index: 1;
+        }
+        /* Main Content Styles */
+        main {
+            padding: 20px;
+            min-height: calc(100vh - 2em - 1em);  /* Adjust based on header and footer height */
+        }
+    </style>
+    <script>
+        function toggleDropdown() {
+            const dropdownContent = document.getElementById("dropdown-content");
+            dropdownContent.style.display = dropdownContent.style.display === "block" ? "none" : "block";
+        }
+    </script>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <h1>{% block header %}FoodSaver{% endblock %}</h1>
+    </header>
+
+    <!-- Navigation -->
+    <nav>
+        <a href="/">Home</a>
+        <a href="/auth/login">Login</a>
+        <a href="/auth/register">Register</a>
+        <a href="/profile">Profile</a>
+        <a href="/meal-plans/meal_plans">Meal Plans</a>
+        <div class="dropdown">
+            <button onclick="toggleDropdown()" class="dropdown-button">Settings</button>
+            <div id="dropdown-content" class="dropdown-content">
+                <a href="/settings">Account Settings</a>
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2023 FoodSaver. All rights reserved.</p>
+    </footer>
+</body>
+</html>

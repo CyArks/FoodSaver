@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+    <!-- Main Container -->
+    <div style="background-color: #333; color: white; padding: 20px; font-family: Arial, sans-serif;">
+
+        <!-- Navigation Bar -->
+        <div style="background-color: #444; padding: 10px;">
+            <a href="/profile" style="margin-right: 20px; color: white; text-decoration: none;">Dashboard</a>
+            <a href="/profile" style="margin-right: 20px; color: white; text-decoration: none;">Profile</a>
+            <a href="/settings/" style="margin-right: 20px; color: white; text-decoration: none;">Settings</a>
+        </div>
+
+        <!-- Header -->
+        <h1 style="font-size: 36px; margin-bottom: 20px;">Welcome, {{ username }}</h1>
+
+        <!-- User-specific Content -->
+        <div style="display: flex; justify-content: space-between;">
+            <div style="width: 48%; background-color: #444; padding: 20px;">
+                <h2>Your Recipes</h2>
+                <p>View and manage your recipes here.</p>
+            </div>
+            <div style="width: 48%; background-color: #444; padding: 20px;">
+                <h2>Your Meal Plans</h2>
+                <p>View and manage your meal plans here.</p>
+            </div>
+        </div>
+
+        <!-- Additional Sections -->
+        <div style="border: 2px solid #555; padding: 20px; margin-top: 20px;">
+            <h2>Notifications</h2>
+            <p>Here you can see your latest notifications.</p>
+        </div>
+
+        <!-- Footer -->
+        <div style="background-color: #444; padding: 10px; margin-top: 20px;">
+            <p style="text-align: center;">&copy; 2023 FoodSaver. All rights reserved.</p>
+        </div>
+    </div>
+{% endblock %}

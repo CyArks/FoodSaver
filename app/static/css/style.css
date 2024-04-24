@@ -1,0 +1,35 @@
+/* styles.css */
+
+:root {
+  --bg-color: #FFF;
+  --text-color: #333;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+h2 {
+    color: #ccc;
+}
+
+form {
+    background-color: #444;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+label, input {
+    margin-bottom: 10px;
+}
+
+.settings-container {
+  margin: 20px;
+  padding: 20px;
+  border: 1px solid #ccc;
+}
+
+.settings-message {
+  margin-top: 20px;
+}
