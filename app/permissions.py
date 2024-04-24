@@ -4,6 +4,7 @@ from flask_principal import Permission, RoleNeed
 admin_permission = Permission(RoleNeed('admin'))
 user_permission = Permission(RoleNeed('user'))
 
+
 def configure_permissions(app):
     """Configure permissions for the given app."""
     from flask_principal import identity_loaded
@@ -23,10 +24,12 @@ def configure_permissions(app):
             for role in sender.current_user.roles:
                 identity.provides.add(RoleNeed(role.name))
 
+
 def require_admin():
     if not admin_permission.can():
         abort(403)
-        
+
+
 def require_user():
     if not user_permission.can():
         abort(403)

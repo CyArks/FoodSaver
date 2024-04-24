@@ -5,6 +5,7 @@ from utils.logger import setup_logger
 import os
 from config import DevelopmentConfig, ProductionConfig
 
+
 def create_app():
     app = Flask(__name__)
     setup_logger(app)
@@ -16,7 +17,6 @@ def create_app():
         app.config.from_object(DevelopmentConfig)
 
     # Initialize other extensions, routes, etc.
-    # ...
 
     # Configure logging
     handler = RotatingFileHandler("app.log", maxBytes=10000, backupCount=3)
@@ -37,6 +37,7 @@ def create_app():
         return jsonify({"error": "Internal Server Error"}), 500
 
     return app
+
 
 if __name__ == "__main__":
     app = create_app()
